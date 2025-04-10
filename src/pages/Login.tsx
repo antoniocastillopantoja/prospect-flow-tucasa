@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -37,9 +38,9 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img 
-            src="https://via.placeholder.com/120x80?text=TuCasaIdeal" 
+            src="/lovable-uploads/9cd54036-11d1-4009-85e7-62990da8b2c2.png" 
             alt="Tucasaideal Logo" 
-            className="mx-auto mb-4"
+            className="mx-auto mb-4 max-h-20"
           />
           <h1 className="text-2xl font-bold text-gray-800">CRM TuCasaIdeal</h1>
         </div>

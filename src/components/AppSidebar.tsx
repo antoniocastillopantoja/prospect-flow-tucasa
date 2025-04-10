@@ -36,11 +36,11 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <div className="flex items-center">
           <img 
-            src="https://via.placeholder.com/40x40?text=TCIdeal" 
+            src="/lovable-uploads/9cd54036-11d1-4009-85e7-62990da8b2c2.png" 
             alt="Tucasaideal Logo" 
-            className="h-10 w-10 mr-2"
+            className="h-10 w-auto mr-2"
           />
-          <h1 className="text-lg font-bold text-white">TuCasaIdeal CRM</h1>
+          <h1 className="text-lg font-bold text-white">CRM</h1>
         </div>
       </SidebarHeader>
       
