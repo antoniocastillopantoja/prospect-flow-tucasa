@@ -15,9 +15,9 @@ interface AppHeaderProps {
 
 export function AppHeader({ toggleSidebar }: AppHeaderProps) {
   return (
-    <header className="border-b bg-crm-red p-4 flex items-center justify-between">
+    <header className="border-b bg-background p-4 flex items-center justify-between">
       <div className="flex-1">
-        <h1 className="text-crm-gold text-lg font-bold">Vendemos tu casa de 1 a 60 días</h1>
+        <h1 className="text-lg font-bold">CRM Dashboard</h1>
       </div>
       
       <div className="flex items-center space-x-4">
@@ -25,15 +25,15 @@ export function AppHeader({ toggleSidebar }: AppHeaderProps) {
           <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input 
             placeholder="Buscar prospectos..." 
-            className="w-full pl-8 bg-white"
+            className="w-full pl-8"
           />
         </div>
         
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="relative text-crm-gold">
+            <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-crm-gold rounded-full"></span>
+              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80">
@@ -59,7 +59,6 @@ export function AppHeader({ toggleSidebar }: AppHeaderProps) {
         <Button 
           variant="default" 
           size="sm"
-          className="bg-crm-gold hover:bg-crm-gold/90 text-crm-red font-bold"
         >
           + Nuevo Prospecto
         </Button>

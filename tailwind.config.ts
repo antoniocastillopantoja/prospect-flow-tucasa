@@ -62,14 +62,6 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				},
-				crm: {
-					red: '#a0181c',
-					darkRed: '#8a1419',
-					gold: '#e6ae00',
-					lightGold: '#ffd700',
-					black: '#000000',
-					darkgray: '#718096'
 				}
 			},
 			borderRadius: {

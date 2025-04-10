@@ -33,14 +33,9 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4 bg-crm-red">
+      <SidebarHeader className="p-4">
         <div className="flex items-center">
-          <img 
-            src="/lovable-uploads/9cd54036-11d1-4009-85e7-62990da8b2c2.png" 
-            alt="Tucasaideal Logo" 
-            className="h-10 w-auto mr-2"
-          />
-          <h1 className="text-lg font-bold text-crm-gold">CRM</h1>
+          <h1 className="text-lg font-bold">CRM System</h1>
         </div>
       </SidebarHeader>
       
@@ -54,7 +49,7 @@ export function AppSidebar() {
                     <NavLink 
                       to={item.path}
                       className={({ isActive }) =>
-                        isActive ? "bg-sidebar-accent text-crm-gold" : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                        isActive ? "bg-sidebar-accent text-sidebar-accent-foreground" : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                       }
                     >
                       <item.icon size={20} />
@@ -72,16 +67,16 @@ export function AppSidebar() {
         <div className="p-4">
           <div className="flex items-center justify-between mb-4 p-2 rounded-md hover:bg-sidebar-accent/50 cursor-pointer">
             <div className="flex items-center">
-              <Avatar className="h-8 w-8 mr-2 bg-crm-gold text-crm-red">
-                <AvatarFallback>JD</AvatarFallback>
+              <Avatar className="h-8 w-8 mr-2">
+                <AvatarFallback>JP</AvatarFallback>
               </Avatar>
               <div>
-                <p className="text-sm font-medium text-crm-gold">Juan Pérez</p>
-                <p className="text-xs text-crm-gold/80">Gerente</p>
+                <p className="text-sm font-medium">Juan Pérez</p>
+                <p className="text-xs text-muted-foreground">Gerente</p>
               </div>
             </div>
           </div>
-          <div className="flex items-center p-2 text-crm-gold hover:bg-sidebar-accent/50 rounded-md cursor-pointer">
+          <div className="flex items-center p-2 hover:bg-sidebar-accent/50 rounded-md cursor-pointer">
             <LogOut size={20} className="mr-2" />
             <span>Cerrar Sesión</span>
           </div>
