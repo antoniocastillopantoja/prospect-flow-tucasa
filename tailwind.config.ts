@@ -64,10 +64,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				crm: {
-					blue: '#3182CE',
-					teal: '#4FD1C5',
-					orange: '#F6AD55',
-					gray: '#F7FAFC',
+					red: '#a0181c',
+					darkRed: '#8a1419',
+					gold: '#e6ae00',
+					lightGold: '#ffd700',
+					black: '#000000',
 					darkgray: '#718096'
 				}
 			},
