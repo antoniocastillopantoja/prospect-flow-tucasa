@@ -34,8 +34,14 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="p-4">
-        <div className="flex items-center">
-          <h1 className="text-lg font-bold">CRM System</h1>
+        <div className="flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <img 
+              src="/lovable-uploads/b569cc80-e658-4bff-950f-e93c7fbbcfb5.png" 
+              alt="Tu Casa Ideal Logo" 
+              className="h-12 object-contain"
+            />
+          </div>
         </div>
       </SidebarHeader>
       
