@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   Calendar,
@@ -16,10 +16,10 @@ import {
   XCircle,
   MessageSquare
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -27,101 +27,128 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { useProspects } from "@/hooks/useProspects";
+import { ProspectStatus } from "@/models/Prospect";
+import ProspectStatusBadge from "@/components/ProspectStatusBadge";
+import { useToast } from "@/hooks/use-toast";
 
 const ProspectDetail = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || "info";
+  
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("info");
-  const [status, setStatus] = useState("contacted");
+  const { toast } = useToast();
+  const { prospects, updateProspect, updateProspectStatus } = useProspects();
+  
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [note, setNote] = useState("");
+  const [prospect, setProspect] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Datos de ejemplo de un prospecto
-  const prospect = {
-    id: 1,
-    name: "Carlos Vega",
-    phone: "555-111-2222",
-    email: "carlos.vega@example.com",
-    location: "Col. Del Valle",
-    sector: "Sur",
-    priceRange: "$2M - $3M",
-    creditType: "Bancario",
-    contactDate: "2025-04-09",
-    agent: "Ana Rodríguez",
-    status: "contacted",
-    notes: [
-      {
-        id: 1,
-        date: "2025-04-09",
-        time: "10:30 AM",
-        text: "Cliente interesado en propiedades de 3 recámaras con estudio. Prefiere planta baja o con elevador.",
-        author: "Ana Rodríguez"
-      },
-      {
-        id: 2,
-        date: "2025-04-08",
-        time: "3:45 PM",
-        text: "Primera llamada. Mostró interés en la zona sur, particularmente Del Valle y Narvarte.",
-        author: "Juan Pérez"
-      }
-    ],
-    appointments: [
-      {
-        id: 1,
-        date: "2025-04-12",
-        time: "11:00 AM",
-        location: "Propiedad en Av. División del Norte 1234",
-        status: "scheduled"
-      }
-    ]
-  };
-  
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case "new": return "status-new";
-      case "contacted": return "status-contacted";
-      case "appointment": return "status-appointment";
-      case "canceled": return "status-canceled";
-      case "closed": return "status-closed";
-      default: return "";
-    }
-  };
+  // Notes and appointments data
+  const [notes, setNotes] = useState<any[]>([]);
+  const [appointments, setAppointments] = useState<any[]>([]);
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "new": return "Nuevo";
-      case "contacted": return "Contactado";
-      case "appointment": return "Cita Agendada";
-      case "canceled": return "Cita Cancelada";
-      case "closed": return "Cliente Cerrado";
-      default: return status;
+  useEffect(() => {
+    if (prospects.length > 0 && id) {
+      const foundProspect = prospects.find(p => p.id === parseInt(id));
+      if (foundProspect) {
+        setProspect(foundProspect);
+        
+        // Mock data for notes and appointments
+        setNotes([
+          {
+            id: 1,
+            date: "2025-04-09",
+            time: "10:30 AM",
+            text: "Cliente interesado en propiedades de 3 recámaras con estudio. Prefiere planta baja o con elevador.",
+            author: "Ana Rodríguez"
+          },
+          {
+            id: 2,
+            date: "2025-04-08",
+            time: "3:45 PM",
+            text: "Primera llamada. Mostró interés en la zona sur, particularmente Del Valle y Narvarte.",
+            author: "Juan Pérez"
+          }
+        ]);
+        
+        setAppointments([
+          {
+            id: 1,
+            date: "2025-04-12",
+            time: "11:00 AM",
+            location: "Propiedad en Av. División del Norte 1234",
+            status: "scheduled"
+          }
+        ]);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "No se encontró el prospecto solicitado."
+        });
+        navigate("/prospectos");
+      }
+      setLoading(false);
     }
-  };
+  }, [prospects, id, navigate, toast]);
   
-  const getAppointmentStatusClass = (status: string) => {
-    switch (status) {
-      case "scheduled": return "status-appointment";
-      case "completed": return "status-closed";
-      case "canceled": return "status-canceled";
-      default: return "";
+  const handleStatusChange = (newStatus: ProspectStatus) => {
+    if (prospect && id) {
+      updateProspectStatus(parseInt(id), newStatus);
+      setProspect({ ...prospect, status: newStatus });
     }
-  };
-  
-  const handleStatusChange = (newStatus: string) => {
-    setStatus(newStatus);
-    // Aquí se actualizaría el estado del prospecto en la base de datos
   };
   
   const handleAddNote = () => {
     if (note.trim() !== "") {
-      // Aquí se agregaría la nota a la base de datos
+      const newNote = {
+        id: notes.length + 1,
+        date: new Date().toISOString().split('T')[0],
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        text: note,
+        author: "Juan Pérez" // Current user (hardcoded for demo)
+      };
+      
+      setNotes([newNote, ...notes]);
       setNote("");
+      
+      toast({
+        title: "Nota añadida",
+        description: "La nota ha sido añadida correctamente."
+      });
     }
   };
   
   const handleScheduleAppointment = () => {
-    // Aquí se abriría un modal para agendar una cita
+    // Here would be a modal to schedule appointment
+    toast({
+      title: "Programar cita",
+      description: "Funcionalidad en desarrollo."
+    });
   };
+  
+  const getAppointmentStatusClass = (status: string) => {
+    switch (status) {
+      case "scheduled": return "bg-purple-100 text-purple-800";
+      case "completed": return "bg-green-100 text-green-800";
+      case "canceled": return "bg-red-100 text-red-800";
+      default: return "";
+    }
+  };
+
+  if (loading || !prospect) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-500">Cargando información del prospecto...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -145,10 +172,10 @@ const ProspectDetail = () => {
         </div>
         
         <div className="flex gap-3">
-          <Select value={status} onValueChange={handleStatusChange}>
+          <Select value={prospect.status} onValueChange={handleStatusChange}>
             <SelectTrigger className="w-44">
               <div className="flex items-center">
-                <span className={`w-2 h-2 rounded-full mr-2 ${getStatusClass(status)}`}></span>
+                <ProspectStatusBadge status={prospect.status} className="ml-0 mr-2" />
                 <SelectValue placeholder="Estado" />
               </div>
             </SelectTrigger>
@@ -206,7 +233,7 @@ const ProspectDetail = () => {
                           </div>
                           <div className="flex items-center">
                             <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                            <span>{prospect.email}</span>
+                            <span>{prospect.email || "No disponible"}</span>
                           </div>
                         </div>
                       </div>
@@ -254,9 +281,7 @@ const ProspectDetail = () => {
                       <div>
                         <p className="text-sm text-gray-500 mb-1">Estado Actual</p>
                         <div className="flex items-center">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(status)}`}>
-                            {getStatusText(status)}
-                          </span>
+                          <ProspectStatusBadge status={prospect.status} />
                         </div>
                       </div>
                     </div>
@@ -283,20 +308,26 @@ const ProspectDetail = () => {
                   
                   <div className="mt-8 space-y-4">
                     <h3 className="font-medium">Historial de Notas</h3>
-                    {prospect.notes.map((note) => (
-                      <div key={note.id} className="border rounded-md p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center">
-                            <MessageSquare className="h-4 w-4 mr-2 text-gray-500" />
-                            <span className="font-medium">{note.author}</span>
+                    {notes.length > 0 ? (
+                      notes.map((note) => (
+                        <div key={note.id} className="border rounded-md p-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex items-center">
+                              <MessageSquare className="h-4 w-4 mr-2 text-gray-500" />
+                              <span className="font-medium">{note.author}</span>
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {note.date} - {note.time}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {note.date} - {note.time}
-                          </div>
+                          <p className="mt-2">{note.text}</p>
                         </div>
-                        <p className="mt-2">{note.text}</p>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No hay notas registradas para este prospecto
                       </div>
-                    ))}
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -313,9 +344,9 @@ const ProspectDetail = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {prospect.appointments.length > 0 ? (
+                  {appointments.length > 0 ? (
                     <div className="space-y-4">
-                      {prospect.appointments.map((appointment) => (
+                      {appointments.map((appointment) => (
                         <div key={appointment.id} className="border rounded-md p-4">
                           <div className="flex justify-between items-start">
                             <div>
@@ -373,31 +404,35 @@ const ProspectDetail = () => {
                   <p className="text-sm font-medium">Cambio de estado</p>
                   <p className="text-xs text-gray-500">09/04/2025 - 10:30 AM</p>
                   <p className="mt-1 text-sm">
-                    Estado actualizado a <span className="font-medium">Contactado</span>
+                    Estado actualizado a <span className="font-medium">{prospect.status === "contacted" ? "Contactado" : "Nuevo"}</span>
                   </p>
                 </div>
                 
-                <div className="border-l-2 border-green-500 pl-3 py-1">
-                  <p className="text-sm font-medium">Nota añadida</p>
-                  <p className="text-xs text-gray-500">09/04/2025 - 10:30 AM</p>
-                  <p className="mt-1 text-sm">
-                    Ana Rodríguez añadió una nueva nota
-                  </p>
-                </div>
+                {notes.length > 0 && (
+                  <div className="border-l-2 border-green-500 pl-3 py-1">
+                    <p className="text-sm font-medium">Nota añadida</p>
+                    <p className="text-xs text-gray-500">{notes[0].date} - {notes[0].time}</p>
+                    <p className="mt-1 text-sm">
+                      {notes[0].author} añadió una nueva nota
+                    </p>
+                  </div>
+                )}
                 
-                <div className="border-l-2 border-purple-500 pl-3 py-1">
-                  <p className="text-sm font-medium">Cita agendada</p>
-                  <p className="text-xs text-gray-500">08/04/2025 - 3:45 PM</p>
-                  <p className="mt-1 text-sm">
-                    Cita programada para el 12/04/2025
-                  </p>
-                </div>
+                {appointments.length > 0 && (
+                  <div className="border-l-2 border-purple-500 pl-3 py-1">
+                    <p className="text-sm font-medium">Cita agendada</p>
+                    <p className="text-xs text-gray-500">08/04/2025 - 3:45 PM</p>
+                    <p className="mt-1 text-sm">
+                      Cita programada para el {appointments[0].date}
+                    </p>
+                  </div>
+                )}
                 
                 <div className="border-l-2 border-orange-500 pl-3 py-1">
                   <p className="text-sm font-medium">Contacto inicial</p>
-                  <p className="text-xs text-gray-500">08/04/2025 - 3:30 PM</p>
+                  <p className="text-xs text-gray-500">{prospect.contactDate} - 3:30 PM</p>
                   <p className="mt-1 text-sm">
-                    Prospecto registrado por Juan Pérez
+                    Prospecto registrado por {prospect.agent}
                   </p>
                 </div>
               </div>

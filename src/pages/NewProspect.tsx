@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -20,11 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { useProspects } from "@/hooks/useProspects";
+import { sectors, creditTypes, agents } from "@/models/Prospect";
+import { toast } from "@/hooks/use-toast";
 
 const NewProspect = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { addProspect } = useProspects();
   
   const [formData, setFormData] = useState({
     name: "",
@@ -60,15 +63,28 @@ const NewProspect = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulación de guardado de datos
+    const priceRange = formData.minPrice && formData.maxPrice 
+      ? `$${formData.minPrice}M - $${formData.maxPrice}M` 
+      : "";
+    
+    addProspect({
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email || undefined,
+      location: formData.location,
+      sector: formData.sector,
+      priceRange,
+      creditType: formData.creditType,
+      contactDate: new Date().toISOString().split('T')[0],
+      agent: formData.assignedTo,
+      status: "new",
+      notes: formData.notes
+    });
+    
     setTimeout(() => {
       setIsLoading(false);
-      toast({
-        title: "Prospecto creado",
-        description: `${formData.name} ha sido registrado correctamente.`
-      });
       navigate("/prospectos");
-    }, 1000);
+    }, 500);
   };
 
   return (
@@ -135,9 +151,9 @@ const NewProspect = () => {
                       <SelectValue placeholder="Selecciona un sector" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Norte">Norte</SelectItem>
-                      <SelectItem value="Sur">Sur</SelectItem>
-                      <SelectItem value="Centro">Centro</SelectItem>
+                      {sectors.map(sector => (
+                        <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -190,11 +206,9 @@ const NewProspect = () => {
                       <SelectValue placeholder="Selecciona tipo de crédito" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Bancario">Bancario</SelectItem>
-                      <SelectItem value="Infonavit">Infonavit</SelectItem>
-                      <SelectItem value="Fovissste">Fovissste</SelectItem>
-                      <SelectItem value="Contado">Contado</SelectItem>
-                      <SelectItem value="Otro">Otro</SelectItem>
+                      {creditTypes.map(type => (
+                        <SelectItem key={type} value={type}>{type}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -209,9 +223,9 @@ const NewProspect = () => {
                       <SelectValue placeholder="Selecciona un agente" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Juan Pérez">Juan Pérez</SelectItem>
-                      <SelectItem value="Ana Rodríguez">Ana Rodríguez</SelectItem>
-                      <SelectItem value="Pedro Ramírez">Pedro Ramírez</SelectItem>
+                      {agents.map(agent => (
+                        <SelectItem key={agent} value={agent}>{agent}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
