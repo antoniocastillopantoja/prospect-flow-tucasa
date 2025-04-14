@@ -35,7 +35,7 @@ const ProspectFilters: React.FC<ProspectFiltersProps> = ({
           <SelectValue placeholder="Estado" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Todos</SelectItem>
+          <SelectItem value="all">Todos</SelectItem>
           <SelectItem value="new">Nuevo</SelectItem>
           <SelectItem value="contacted">Contactado</SelectItem>
           <SelectItem value="appointment">Cita Agendada</SelectItem>
@@ -49,7 +49,7 @@ const ProspectFilters: React.FC<ProspectFiltersProps> = ({
           <SelectValue placeholder="Sector" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Todos</SelectItem>
+          <SelectItem value="all">Todos</SelectItem>
           {sectors.map(sector => (
             <SelectItem key={sector} value={sector}>{sector}</SelectItem>
           ))}
