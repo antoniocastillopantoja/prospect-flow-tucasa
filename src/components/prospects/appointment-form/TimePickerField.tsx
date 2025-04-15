@@ -43,13 +43,13 @@ const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
-                    variant={"outline"}
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={isOpen}
                     className={cn(
                       "w-full pl-3 text-left font-normal",
                       !field.value && "text-muted-foreground"
                     )}
-                    type="button"
-                    onClick={() => setIsOpen(true)}
                   >
                     {field.value ? (
                       <span>{field.value} hrs</span>
@@ -61,18 +61,18 @@ const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-0 bg-background"
+                className="w-auto p-2"
                 align="start"
               >
-                <ScrollArea className="h-[300px] p-2">
-                  <div className="grid grid-cols-2 gap-1 p-2">
+                <ScrollArea className="h-[300px]">
+                  <div className="grid grid-cols-2 gap-2">
                     {TIME_SLOTS.map((time) => (
                       <Button
                         key={time}
                         type="button"
                         variant={field.value === time ? "default" : "outline"}
                         className={cn(
-                          "text-left font-normal w-full",
+                          "text-left font-normal",
                           field.value === time && "bg-primary text-primary-foreground"
                         )}
                         onClick={() => handleTimeSelect(time)}
