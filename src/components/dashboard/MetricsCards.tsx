@@ -26,7 +26,7 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
       title: "Contactados",
       value: metrics.contactados,
       icon: Phone,
-      color: "yellow",
+      color: "yellow", // Ensure this is used for background
       delay: "150ms"
     },
     {
