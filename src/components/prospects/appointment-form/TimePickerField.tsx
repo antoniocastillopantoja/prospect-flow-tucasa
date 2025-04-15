@@ -20,6 +20,8 @@ interface TimePickerFieldProps {
 }
 
 const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
+  const [open, setOpen] = React.useState(false);
+
   return (
     <FormField
       control={control}
@@ -27,7 +29,7 @@ const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
       render={({ field }) => (
         <FormItem className="flex flex-col">
           <FormLabel>Hora</FormLabel>
-          <Popover>
+          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
@@ -62,8 +64,7 @@ const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
                     )}
                     onClick={() => {
                       field.onChange(time);
-                      // Cerrar el popover después de seleccionar
-                      document.body.click();
+                      setOpen(false); // Cierra el popover después de seleccionar
                     }}
                   >
                     {time} hrs
