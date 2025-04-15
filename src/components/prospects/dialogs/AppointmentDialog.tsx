@@ -31,6 +31,7 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({
           onSubmit={onSubmit}
           onCancel={onCancel}
           isLoading={isLoading}
+          useGoogleCalendar={true}
         />
       </DialogContent>
     </Dialog>

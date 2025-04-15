@@ -11,6 +11,7 @@ export interface Appointment {
   type: string;
   notes?: string;
   status: "scheduled" | "completed" | "canceled";
+  googleCalendarEventId?: string;
 }
 
 export function useAppointments(initialAppointments: Appointment[] = []) {
@@ -32,14 +33,16 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
     
     // Simulate API call with timeout
     setTimeout(() => {
-      const newAppointment = {
+      const newAppointment: Appointment = {
         id: appointments.length + 1,
         date: format(data.date, 'yyyy-MM-dd'),
         time: data.time,
         location: data.location,
         type: data.type,
         notes: data.notes,
-        status: "scheduled" as const
+        status: "scheduled" as const,
+        // Simulamos que obtuvimos un ID de evento de Google Calendar
+        googleCalendarEventId: `gc-event-${Math.random().toString(36).substring(2, 11)}`
       };
       
       setAppointments([newAppointment, ...appointments]);
@@ -48,7 +51,7 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
       
       toast({
         title: "Cita programada",
-        description: `Se ha programado una cita para el ${format(data.date, 'dd/MM/yyyy')} a las ${data.time}.`
+        description: `Se ha programado una cita para el ${format(data.date, 'dd/MM/yyyy')} a las ${data.time} y se ha sincronizado con Google Calendar.`
       });
     }, 500);
 

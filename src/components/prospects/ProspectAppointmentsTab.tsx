@@ -10,6 +10,7 @@ interface Appointment {
   time: string;
   location: string;
   status: string;
+  googleCalendarEventId?: string;
 }
 
 interface ProspectAppointmentsTabProps {
@@ -53,6 +54,15 @@ const ProspectAppointmentsTab: React.FC<ProspectAppointmentsTabProps> = ({
                       <span className="mx-2">•</span>
                       <Clock className="h-4 w-4 mr-2 text-gray-500" />
                       <span>{appointment.time}</span>
+                      
+                      {appointment.googleCalendarEventId && (
+                        <>
+                          <span className="mx-2">•</span>
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                            Google Calendar
+                          </span>
+                        </>
+                      )}
                     </div>
                     <div className="flex items-center text-gray-600">
                       <MapPin className="h-4 w-4 mr-2 text-gray-500" />
