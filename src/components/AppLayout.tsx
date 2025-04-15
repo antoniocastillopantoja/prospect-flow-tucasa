@@ -4,13 +4,19 @@ import { Navigate, Outlet } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AppHeader } from "@/components/AppHeader";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { isAuthenticated, isLoading } = useAuth();
   
-  // Check if user is authenticated - for demo purposes we'll always return true
-  // In a real application, you would check for an auth token or user session
-  const isAuthenticated = true;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Cargando...</p>
+      </div>
+    );
+  }
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
