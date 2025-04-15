@@ -40,7 +40,7 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
       <FormField
         control={form.control}
         name="phone"
-        render={({ field }) => (
+        render={({ field: { onChange, ...fieldProps } }) => (
           <FormItem>
             <div className="flex items-center gap-2">
               <FormLabel>Teléfono</FormLabel>
@@ -54,7 +54,26 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
               </Tooltip>
             </div>
             <FormControl>
-              <Input required {...field} />
+              <Input 
+                required 
+                type="tel"
+                placeholder="(123) 456-7890"
+                onChange={(e) => {
+                  // Format phone number as user types (XXX) XXX-XXXX
+                  const value = e.target.value.replace(/\D/g, '').substring(0, 10);
+                  const formattedValue = value.length > 0 
+                    ? value.length > 6 
+                      ? `(${value.substring(0, 3)}) ${value.substring(3, 6)}-${value.substring(6)}`
+                      : value.length > 3 
+                        ? `(${value.substring(0, 3)}) ${value.substring(3)}`
+                        : `(${value}`
+                    : '';
+                  
+                  e.target.value = formattedValue;
+                  onChange(e);
+                }} 
+                {...fieldProps} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -78,7 +97,12 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
               </Tooltip>
             </div>
             <FormControl>
-              <Input type="email" {...field} />
+              <Input 
+                type="email" 
+                placeholder="ejemplo@correo.com"
+                pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
+                {...field} 
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
