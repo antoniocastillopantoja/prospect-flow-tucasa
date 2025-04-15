@@ -22,7 +22,8 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
       title: "Nuevos Prospectos",
       value: metrics.nuevos,
       icon: Users,
-      color: "blue",
+      bgColor: "bg-blue-100",
+      textColor: "text-blue-600",
       delay: "0ms",
       onClick: () => navigate("/prospectos", { state: { filter: "new" } })
     },
@@ -30,7 +31,8 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
       title: "Contactados",
       value: metrics.contactados,
       icon: Phone,
-      color: "yellow",
+      bgColor: "bg-yellow-100",
+      textColor: "text-yellow-600",
       delay: "150ms",
       onClick: () => navigate("/prospectos", { state: { filter: "contacted" } })
     },
@@ -38,7 +40,8 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
       title: "Citas Agendadas",
       value: metrics.citas,
       icon: Calendar,
-      color: "purple",
+      bgColor: "bg-purple-100",
+      textColor: "text-purple-600",
       delay: "300ms",
       onClick: () => navigate("/calendario")
     },
@@ -46,7 +49,8 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
       title: "Cerrados",
       value: metrics.cerrados,
       icon: Home,
-      color: "green",
+      bgColor: "bg-green-100",
+      textColor: "text-green-600",
       delay: "450ms",
       onClick: () => navigate("/prospectos", { state: { filter: "closed" } })
     }
@@ -71,8 +75,8 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
                   <p className="text-2xl font-bold">{card.value}</p>
                 )}
               </div>
-              <div className={`bg-${card.color}-100 p-2 rounded-full transition-all duration-200 hover:scale-110`}>
-                <card.icon className={`h-5 w-5 text-${card.color}-600`} />
+              <div className={`${card.bgColor} p-2 rounded-full transition-all duration-200 hover:scale-110`}>
+                <card.icon className={`h-5 w-5 ${card.textColor}`} />
               </div>
             </div>
           </CardContent>
