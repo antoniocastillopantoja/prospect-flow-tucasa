@@ -75,4 +75,3 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
 };
 
 export default MetricsCards;
-
