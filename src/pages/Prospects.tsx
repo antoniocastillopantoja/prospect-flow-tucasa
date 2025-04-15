@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useProspects } from "@/hooks/useProspects";
 import ProspectSearchBar from "@/components/prospects/ProspectSearchBar";
@@ -11,6 +11,7 @@ import { useSearchContext } from "@/contexts/SearchContext";
 const Prospects = () => {
   const { prospects, loading, updateProspectStatus } = useProspects();
   const { searchQuery } = useSearchContext();
+  const location = useLocation();
   
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -20,6 +21,13 @@ const Prospects = () => {
   useEffect(() => {
     setLocalSearchQuery(searchQuery);
   }, [searchQuery]);
+  
+  // Apply filter if provided in navigation state
+  useEffect(() => {
+    if (location.state && location.state.filter) {
+      setStatusFilter(location.state.filter);
+    }
+  }, [location.state]);
   
   const filteredProspects = prospects.filter((prospect) => {
     const matchesSearch = localSearchQuery === "" || 
