@@ -4,6 +4,7 @@ import { Clock } from "lucide-react";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 // Available time slots for the time picker with 15-minute intervals
@@ -63,22 +64,24 @@ const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
                 className="w-auto p-0 bg-background"
                 align="start"
               >
-                <div className="overflow-y-auto max-h-[300px] p-2 grid grid-cols-2 gap-1">
-                  {TIME_SLOTS.map((time) => (
-                    <Button
-                      key={time}
-                      type="button"
-                      variant={field.value === time ? "default" : "outline"}
-                      className={cn(
-                        "text-left font-normal w-full",
-                        field.value === time && "bg-primary text-primary-foreground"
-                      )}
-                      onClick={() => handleTimeSelect(time)}
-                    >
-                      {time} hrs
-                    </Button>
-                  ))}
-                </div>
+                <ScrollArea className="h-[300px] p-2">
+                  <div className="grid grid-cols-2 gap-1 p-2">
+                    {TIME_SLOTS.map((time) => (
+                      <Button
+                        key={time}
+                        type="button"
+                        variant={field.value === time ? "default" : "outline"}
+                        className={cn(
+                          "text-left font-normal w-full",
+                          field.value === time && "bg-primary text-primary-foreground"
+                        )}
+                        onClick={() => handleTimeSelect(time)}
+                      >
+                        {time} hrs
+                      </Button>
+                    ))}
+                  </div>
+                </ScrollArea>
               </PopoverContent>
             </Popover>
             <FormMessage />
