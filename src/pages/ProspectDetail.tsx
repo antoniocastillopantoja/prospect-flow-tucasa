@@ -177,7 +177,9 @@ const ProspectDetail = () => {
       
       <AppointmentDialog 
         isOpen={isSchedulingAppointment}
-        onOpenChange={handleCancelAppointmentScheduling}
+        onOpenChange={(open) => {
+          if (!open) handleCancelAppointmentScheduling();
+        }}
         onSubmit={onAppointmentSubmit}
         onCancel={handleCancelAppointmentScheduling}
         isLoading={appointmentLoading}

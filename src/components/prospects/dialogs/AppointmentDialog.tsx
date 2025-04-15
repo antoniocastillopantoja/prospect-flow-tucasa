@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import AppointmentForm from "@/components/prospects/AppointmentForm";
 
 interface AppointmentDialogProps {
@@ -23,6 +23,9 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Programar Cita</DialogTitle>
+          <DialogDescription>
+            Complete los datos para programar una nueva cita con el prospecto.
+          </DialogDescription>
         </DialogHeader>
         <AppointmentForm 
           onSubmit={onSubmit}

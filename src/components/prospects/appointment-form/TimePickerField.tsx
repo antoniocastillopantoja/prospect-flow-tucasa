@@ -25,7 +25,7 @@ const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="flex flex-col">
           <FormLabel>Hora</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
