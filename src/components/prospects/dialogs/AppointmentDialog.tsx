@@ -18,6 +18,11 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({
   onCancel,
   isLoading
 }) => {
+  const handleSubmit = (data: any) => {
+    // Add the Google Calendar flag to the data
+    onSubmit({ ...data, useGoogleCalendar: true });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
@@ -28,7 +33,7 @@ const AppointmentDialog: React.FC<AppointmentDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         <AppointmentForm 
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit}
           onCancel={onCancel}
           isLoading={isLoading}
           useGoogleCalendar={true}

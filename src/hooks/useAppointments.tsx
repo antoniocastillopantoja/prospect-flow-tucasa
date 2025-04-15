@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { useCalendarIntegration } from "@/hooks/useCalendarIntegration";
 
 export interface Appointment {
   id: number;
@@ -19,6 +20,7 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
   const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
   const [appointmentLoading, setAppointmentLoading] = useState(false);
   const { toast } = useToast();
+  const { createGoogleCalendarEvent, isGoogleCalendarSyncing } = useCalendarIntegration();
 
   const handleScheduleAppointment = () => {
     setIsSchedulingAppointment(true);
@@ -28,11 +30,34 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
     setIsSchedulingAppointment(false);
   };
 
-  const handleAppointmentSubmit = (data: any) => {
+  const handleAppointmentSubmit = async (data: any) => {
     setAppointmentLoading(true);
     
-    // Simulate API call with timeout
-    setTimeout(() => {
+    try {
+      // Create Google Calendar event if needed
+      let googleCalendarEventId: string | undefined = undefined;
+      
+      if (data.useGoogleCalendar) {
+        try {
+          googleCalendarEventId = await createGoogleCalendarEvent({
+            title: "Prospecto",
+            location: data.location,
+            description: data.notes || "",
+            date: data.date,
+            time: data.time,
+            type: data.type
+          });
+        } catch (error) {
+          console.error("Error creating Google Calendar event:", error);
+          toast({
+            variant: "destructive",
+            title: "Error de sincronización",
+            description: "No se pudo crear el evento en Google Calendar."
+          });
+        }
+      }
+      
+      // Create the new appointment
       const newAppointment: Appointment = {
         id: appointments.length + 1,
         date: format(data.date, 'yyyy-MM-dd'),
@@ -41,27 +66,33 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
         type: data.type,
         notes: data.notes,
         status: "scheduled" as const,
-        // Simulamos que obtuvimos un ID de evento de Google Calendar
-        googleCalendarEventId: `gc-event-${Math.random().toString(36).substring(2, 11)}`
+        googleCalendarEventId
       };
       
+      // Update state with the new appointment
       setAppointments([newAppointment, ...appointments]);
-      setAppointmentLoading(false);
-      setIsSchedulingAppointment(false);
       
+      // Show success message
+      const calendarMessage = googleCalendarEventId 
+        ? " y se ha sincronizado con Google Calendar"
+        : "";
+        
       toast({
         title: "Cita programada",
-        description: `Se ha programado una cita para el ${format(data.date, 'dd/MM/yyyy')} a las ${data.time} y se ha sincronizado con Google Calendar.`
+        description: `Se ha programado una cita para el ${format(data.date, 'dd/MM/yyyy')} a las ${data.time}${calendarMessage}.`
       });
-    }, 500);
-
-    return "appointments"; // Return the tab to switch to
+      
+      return "appointments"; // Return the tab to switch to
+    } finally {
+      setAppointmentLoading(false);
+      setIsSchedulingAppointment(false);
+    }
   };
 
   return {
     appointments,
     isSchedulingAppointment,
-    appointmentLoading,
+    appointmentLoading: appointmentLoading || isGoogleCalendarSyncing,
     handleScheduleAppointment,
     handleCancelAppointmentScheduling,
     handleAppointmentSubmit,
