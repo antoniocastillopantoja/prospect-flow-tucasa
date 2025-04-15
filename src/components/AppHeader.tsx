@@ -1,5 +1,6 @@
-
-import { Bell, Search } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Bell, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,6 +15,12 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ toggleSidebar }: AppHeaderProps) {
+  const navigate = useNavigate();
+
+  const handleNewProspect = () => {
+    navigate("/prospectos/nuevo");
+  };
+
   return (
     <header className="border-b bg-background p-4 flex items-center justify-between">
       <div className="flex-1">
@@ -59,8 +66,9 @@ export function AppHeader({ toggleSidebar }: AppHeaderProps) {
         <Button 
           variant="default" 
           size="sm"
+          onClick={handleNewProspect}
         >
-          + Nuevo Prospecto
+          <Plus className="mr-2 h-4 w-4" /> Nuevo Prospecto
         </Button>
       </div>
     </header>
