@@ -4,26 +4,29 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, MapPin } from "lucide-react";
 import ProspectStatusBadge from "@/components/ProspectStatusBadge";
+import { Prospect as ModelProspect } from "@/models/Prospect";
 import "./dashboard.css";
 
-interface Prospect {
-  id: number;
-  name: string;
-  location: string;
-  priceRange: string;
-  status: string;
-  createdAt: Date;
+// Define a local interface that extends the model Prospect with the properties needed for this component
+interface Prospect extends ModelProspect {
+  createdAt: Date; // This property is derived from contactDate in our implementation
 }
 
 interface RecentProspectsProps {
-  allProspects: Prospect[];
+  allProspects: ModelProspect[];
 }
 
 const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
   const [timeframe, setTimeframe] = useState("hoy");
 
+  // Convert model prospects to local prospects with createdAt derived from contactDate
+  const prospectsWithCreatedAt: Prospect[] = allProspects.map(prospect => ({
+    ...prospect,
+    createdAt: new Date(prospect.contactDate)
+  }));
+
   // Filter prospects based on timeframe
-  const filteredProspects = allProspects.filter(prospect => {
+  const filteredProspects = prospectsWithCreatedAt.filter(prospect => {
     const now = new Date();
     const prospectDate = prospect.createdAt;
     
@@ -73,7 +76,7 @@ const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
               >
                 <div className="flex justify-between items-start mb-1">
                   <p className="font-medium">{prospect.name}</p>
-                  <ProspectStatusBadge status={prospect.status as any} />
+                  <ProspectStatusBadge status={prospect.status} />
                 </div>
                 <div className="flex items-center text-sm text-gray-500 space-x-3">
                   <div className="flex items-center">
