@@ -35,7 +35,6 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
   });
 
   const handleSubmit = (data: FormValues) => {
-    // Asegurarse de que todos los datos estén correctos antes de enviar
     console.log("Submitting appointment data:", data);
     onSubmit(data);
   };

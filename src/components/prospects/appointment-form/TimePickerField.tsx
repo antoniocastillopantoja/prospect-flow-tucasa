@@ -20,62 +20,69 @@ interface TimePickerFieldProps {
 }
 
 const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
-  const [open, setOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
-        <FormItem className="flex flex-col">
-          <FormLabel>Hora</FormLabel>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full pl-3 text-left font-normal",
-                    !field.value && "text-muted-foreground"
-                  )}
-                >
-                  {field.value ? (
-                    <span>{field.value} hrs</span>
-                  ) : (
-                    <span>Seleccionar hora</span>
-                  )}
-                  <Clock className="ml-auto h-4 w-4 opacity-50" />
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-auto p-0 bg-background"
-              align="start"
-            >
-              <div className="overflow-y-auto max-h-[300px] p-2 grid grid-cols-2 gap-1">
-                {TIME_SLOTS.map((time) => (
+      render={({ field }) => {
+        const handleTimeSelect = (time: string) => {
+          field.onChange(time);
+          setIsOpen(false);
+          console.log(`Selected time: ${time}`);
+        };
+
+        return (
+          <FormItem className="flex flex-col">
+            <FormLabel>Hora</FormLabel>
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
+              <PopoverTrigger asChild>
+                <FormControl>
                   <Button
-                    key={time}
-                    type="button"
-                    variant={field.value === time ? "default" : "outline"}
+                    variant={"outline"}
                     className={cn(
-                      "text-left font-normal w-full",
-                      field.value === time && "bg-primary text-primary-foreground"
+                      "w-full pl-3 text-left font-normal",
+                      !field.value && "text-muted-foreground"
                     )}
-                    onClick={() => {
-                      field.onChange(time);
-                      setOpen(false); // Cierra el popover después de seleccionar
-                    }}
+                    type="button"
+                    onClick={() => setIsOpen(true)}
                   >
-                    {time} hrs
+                    {field.value ? (
+                      <span>{field.value} hrs</span>
+                    ) : (
+                      <span>Seleccionar hora</span>
+                    )}
+                    <Clock className="ml-auto h-4 w-4 opacity-50" />
                   </Button>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-          <FormMessage />
-        </FormItem>
-      )}
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent
+                className="w-auto p-0 bg-background"
+                align="start"
+              >
+                <div className="overflow-y-auto max-h-[300px] p-2 grid grid-cols-2 gap-1">
+                  {TIME_SLOTS.map((time) => (
+                    <Button
+                      key={time}
+                      type="button"
+                      variant={field.value === time ? "default" : "outline"}
+                      className={cn(
+                        "text-left font-normal w-full",
+                        field.value === time && "bg-primary text-primary-foreground"
+                      )}
+                      onClick={() => handleTimeSelect(time)}
+                    >
+                      {time} hrs
+                    </Button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 };
