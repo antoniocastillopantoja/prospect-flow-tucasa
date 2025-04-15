@@ -25,11 +25,11 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
       <div className="w-full max-w-md">
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-6 w-full">
           <img 
             src="/lovable-uploads/b569cc80-e658-4bff-950f-e93c7fbbcfb5.png" 
             alt="Tu Casa Ideal" 
-            className="h-20 object-contain"
+            className="w-full h-auto object-contain"
           />
         </div>
         
@@ -62,3 +62,4 @@ const Login = () => {
 }
 
 export default Login;
+
