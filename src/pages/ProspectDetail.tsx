@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -176,7 +177,7 @@ const ProspectDetail = () => {
       
       <AppointmentDialog 
         isOpen={isSchedulingAppointment}
-        onOpenChange={setIsSchedulingAppointment}
+        onOpenChange={handleCancelAppointmentScheduling}
         onSubmit={onAppointmentSubmit}
         onCancel={handleCancelAppointmentScheduling}
         isLoading={appointmentLoading}
