@@ -26,7 +26,7 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
       title: "Contactados",
       value: metrics.contactados,
       icon: Phone,
-      color: "yellow", // Explicitly set color to yellow
+      color: "yellow",
       delay: "150ms"
     },
     {
