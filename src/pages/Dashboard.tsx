@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Home, MapPin, Phone, Plus, User, Users } from "lucide-react";
+import { toast } from "sonner";
 
 const Dashboard = () => {
   const [timeframe, setTimeframe] = useState("hoy");
@@ -38,6 +39,16 @@ const Dashboard = () => {
       location: "Col. Polanco"
     }
   ];
+  
+  const handleCall = (phone: string, name: string) => {
+    // Use the tel: protocol to initiate a phone call
+    window.location.href = `tel:${phone}`;
+    
+    // Show a toast notification
+    toast.success(`Llamando a ${name}`, {
+      description: phone,
+    });
+  };
   
   const prospects = [
     { 
@@ -190,7 +201,12 @@ const Dashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <Button variant="outline" size="sm" className="flex items-center">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center"
+                      onClick={() => handleCall(appointment.phone, appointment.name)}
+                    >
                       <Phone className="h-3 w-3 mr-1" />
                       Llamar
                     </Button>
