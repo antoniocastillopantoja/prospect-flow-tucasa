@@ -25,7 +25,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
       <div className="w-full max-w-md">
-        <div className="flex justify-center mb-6 w-full">
+        <div className="mb-0 w-full bg-white rounded-t-lg overflow-hidden">
           <img 
             src="/lovable-uploads/b569cc80-e658-4bff-950f-e93c7fbbcfb5.png" 
             alt="Tu Casa Ideal" 
@@ -33,7 +33,7 @@ const Login = () => {
           />
         </div>
         
-        <Card className="shadow-lg">
+        <Card className="shadow-lg rounded-t-none">
           <CardHeader className="pb-2">
             <CardTitle className="text-center text-primary text-2xl">Sistema CRM</CardTitle>
             <CardDescription className="text-center">
@@ -62,4 +62,3 @@ const Login = () => {
 }
 
 export default Login;
-
