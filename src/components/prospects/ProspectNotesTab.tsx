@@ -27,11 +27,6 @@ const ProspectNotesTab: React.FC<ProspectNotesTabProps> = ({ notes, onAddNote })
     if (note.trim() !== "") {
       onAddNote(note);
       setNote("");
-      
-      toast({
-        title: "Nota añadida",
-        description: "La nota ha sido añadida correctamente."
-      });
     }
   };
 
