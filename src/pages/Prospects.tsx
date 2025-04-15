@@ -1,8 +1,6 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useProspects } from "@/hooks/useProspects";
 import ProspectSearchBar from "@/components/prospects/ProspectSearchBar";
@@ -10,16 +8,11 @@ import ProspectFilters from "@/components/prospects/ProspectFilters";
 import ProspectList from "@/components/prospects/ProspectList";
 
 const Prospects = () => {
-  const navigate = useNavigate();
   const { prospects, loading, updateProspectStatus } = useProspects();
   
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sectorFilter, setSectorFilter] = useState("");
-  
-  const handleNewProspect = () => {
-    navigate("/prospectos/nuevo");
-  };
 
   const filteredProspects = prospects.filter((prospect) => {
     const matchesSearch = searchQuery === "" || 
@@ -35,11 +28,8 @@ const Prospects = () => {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div className="flex justify-between items-start sm:items-center mb-6 gap-4">
         <h1 className="text-2xl font-bold">Prospectos</h1>
-        <Button onClick={handleNewProspect}>
-          <Plus className="mr-2 h-4 w-4" /> Nuevo Prospecto
-        </Button>
       </div>
       
       {/* Filtros y búsqueda */}
@@ -72,3 +62,4 @@ const Prospects = () => {
 };
 
 export default Prospects;
+
