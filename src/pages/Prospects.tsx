@@ -1,24 +1,31 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useProspects } from "@/hooks/useProspects";
 import ProspectSearchBar from "@/components/prospects/ProspectSearchBar";
 import ProspectFilters from "@/components/prospects/ProspectFilters";
 import ProspectList from "@/components/prospects/ProspectList";
+import { useSearchContext } from "@/contexts/SearchContext";
 
 const Prospects = () => {
   const { prospects, loading, updateProspectStatus } = useProspects();
+  const { searchQuery } = useSearchContext();
   
-  const [searchQuery, setSearchQuery] = useState("");
+  const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sectorFilter, setSectorFilter] = useState("");
 
+  // Sync the local search with the global search context
+  useEffect(() => {
+    setLocalSearchQuery(searchQuery);
+  }, [searchQuery]);
+  
   const filteredProspects = prospects.filter((prospect) => {
-    const matchesSearch = searchQuery === "" || 
-      prospect.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      prospect.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      prospect.phone.includes(searchQuery);
+    const matchesSearch = localSearchQuery === "" || 
+      prospect.name.toLowerCase().includes(localSearchQuery.toLowerCase()) || 
+      prospect.location.toLowerCase().includes(localSearchQuery.toLowerCase()) ||
+      prospect.phone.includes(localSearchQuery);
       
     const matchesStatus = statusFilter === "" || prospect.status === statusFilter;
     const matchesSector = sectorFilter === "" || prospect.sector === sectorFilter;
@@ -37,8 +44,8 @@ const Prospects = () => {
         <CardContent className="p-4">
           <div className="flex flex-col md:flex-row gap-4">
             <ProspectSearchBar 
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
+              searchQuery={localSearchQuery}
+              setSearchQuery={setLocalSearchQuery}
             />
             
             <ProspectFilters
@@ -62,4 +69,3 @@ const Prospects = () => {
 };
 
 export default Prospects;
-
