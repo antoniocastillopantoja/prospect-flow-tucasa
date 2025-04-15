@@ -14,10 +14,12 @@ import ProspectNotesTab from "@/components/prospects/ProspectNotesTab";
 import ProspectAppointmentsTab from "@/components/prospects/ProspectAppointmentsTab";
 import ProspectActivityFeed from "@/components/prospects/ProspectActivityFeed";
 import { ProspectForm } from "@/components/prospects/ProspectForm";
+import AppointmentForm from "@/components/prospects/AppointmentForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ProspectFormData } from "@/types/prospects";
+import { format } from "date-fns";
 
 // Define the validation schema using zod
 const prospectFormSchema = z.object({
@@ -47,6 +49,8 @@ const ProspectDetail = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [isSchedulingAppointment, setIsSchedulingAppointment] = useState(false);
+  const [appointmentLoading, setAppointmentLoading] = useState(false);
 
   // Notes and appointments data
   const [notes, setNotes] = useState<any[]>([]);
@@ -156,11 +160,40 @@ const ProspectDetail = () => {
   };
   
   const handleScheduleAppointment = () => {
-    // Here would be a modal to schedule appointment
-    toast({
-      title: "Programar cita",
-      description: "Funcionalidad en desarrollo."
-    });
+    setIsSchedulingAppointment(true);
+  };
+
+  const handleAppointmentSubmit = (data: any) => {
+    setAppointmentLoading(true);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      const newAppointment = {
+        id: appointments.length + 1,
+        date: format(data.date, 'yyyy-MM-dd'),
+        time: data.time,
+        location: data.location,
+        type: data.type,
+        notes: data.notes,
+        status: "scheduled"
+      };
+      
+      setAppointments([newAppointment, ...appointments]);
+      setAppointmentLoading(false);
+      setIsSchedulingAppointment(false);
+      
+      toast({
+        title: "Cita programada",
+        description: `Se ha programado una cita para el ${format(data.date, 'dd/MM/yyyy')} a las ${data.time}.`
+      });
+      
+      // Switch to appointments tab after scheduling
+      setActiveTab("appointments");
+    }, 500);
+  };
+
+  const handleCancelAppointmentScheduling = () => {
+    setIsSchedulingAppointment(false);
   };
 
   const handleEdit = () => {
@@ -295,6 +328,20 @@ const ProspectDetail = () => {
             onSubmit={handleSaveEdit}
             onCancel={closeEditDialog}
             isLoading={editLoading}
+          />
+        </DialogContent>
+      </Dialog>
+      
+      {/* Schedule Appointment Dialog */}
+      <Dialog open={isSchedulingAppointment} onOpenChange={setIsSchedulingAppointment}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Programar Cita</DialogTitle>
+          </DialogHeader>
+          <AppointmentForm 
+            onSubmit={handleAppointmentSubmit}
+            onCancel={handleCancelAppointmentScheduling}
+            isLoading={appointmentLoading}
           />
         </DialogContent>
       </Dialog>
