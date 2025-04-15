@@ -1,4 +1,5 @@
 
+import { Info } from "lucide-react";
 import {
   FormControl,
   FormField,
@@ -17,6 +18,7 @@ import {
 import { sectors } from "@/models/Prospect";
 import { UseFormReturn } from "react-hook-form";
 import { ProspectFormData } from "@/types/prospects";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface LocationFieldsProps {
   form: UseFormReturn<ProspectFormData>;
@@ -30,7 +32,17 @@ export function LocationFields({ form }: LocationFieldsProps) {
         name="sector"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Sector</FormLabel>
+            <div className="flex items-center gap-2">
+              <FormLabel>Sector</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Zona general de interés del prospecto</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select
               onValueChange={field.onChange}
               value={field.value}

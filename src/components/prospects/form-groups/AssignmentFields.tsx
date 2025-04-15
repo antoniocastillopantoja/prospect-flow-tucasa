@@ -1,4 +1,5 @@
 
+import { Info } from "lucide-react";
 import {
   FormControl,
   FormField,
@@ -16,6 +17,7 @@ import {
 import { creditTypes, agents } from "@/models/Prospect";
 import { UseFormReturn } from "react-hook-form";
 import { ProspectFormData } from "@/types/prospects";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AssignmentFieldsProps {
   form: UseFormReturn<ProspectFormData>;
@@ -29,7 +31,17 @@ export function AssignmentFields({ form }: AssignmentFieldsProps) {
         name="creditType"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Tipo de crédito</FormLabel>
+            <div className="flex items-center gap-2">
+              <FormLabel>Tipo de crédito</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Tipo de financiamiento que busca el prospecto</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select
               onValueChange={field.onChange}
               value={field.value}
@@ -55,7 +67,17 @@ export function AssignmentFields({ form }: AssignmentFieldsProps) {
         name="assignedTo"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Asignar a</FormLabel>
+            <div className="flex items-center gap-2">
+              <FormLabel>Asignar a</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Agente responsable del seguimiento</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select
               onValueChange={field.onChange}
               value={field.value}

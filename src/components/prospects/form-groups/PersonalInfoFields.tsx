@@ -1,8 +1,10 @@
 
+import { Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
 import { ProspectFormData } from "@/types/prospects";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PersonalInfoFieldsProps {
   form: UseFormReturn<ProspectFormData>;
@@ -16,7 +18,17 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
         name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Nombre completo</FormLabel>
+            <div className="flex items-center gap-2">
+              <FormLabel>Nombre completo</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Ingresa el nombre completo del prospecto</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <Input required {...field} />
             </FormControl>
@@ -30,7 +42,17 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
         name="phone"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Teléfono</FormLabel>
+            <div className="flex items-center gap-2">
+              <FormLabel>Teléfono</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Número de contacto principal</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <Input required {...field} />
             </FormControl>
@@ -44,7 +66,17 @@ export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
         name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Correo electrónico</FormLabel>
+            <div className="flex items-center gap-2">
+              <FormLabel>Correo electrónico</FormLabel>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Correo para envío de información y seguimiento</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <FormControl>
               <Input type="email" {...field} />
             </FormControl>
