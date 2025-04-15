@@ -3,9 +3,13 @@ import React from "react";
 import { Clock } from "lucide-react";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Available time slots for the time picker with 15-minute intervals
 export const TIME_SLOTS = [
@@ -23,69 +27,36 @@ interface TimePickerFieldProps {
 }
 
 const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
-  const [isOpen, setIsOpen] = React.useState(false);
-
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => {
-        const handleTimeSelect = (time: string) => {
-          field.onChange(time);
-          setIsOpen(false);
-          console.log(`Selected time: ${time}`);
-        };
-
         return (
           <FormItem className="flex flex-col">
             <FormLabel>Hora</FormLabel>
-            <Popover open={isOpen} onOpenChange={setIsOpen}>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={isOpen}
-                    className={cn(
-                      "w-full pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      <span>{field.value} hrs</span>
-                    ) : (
-                      <span>Seleccionar hora</span>
-                    )}
-                    <Clock className="ml-auto h-4 w-4 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent
-                className="w-[280px] p-0"
-                align="start"
-                sideOffset={5}
-                style={{ zIndex: 9999 }}
-              >
-                <ScrollArea className="h-[280px] p-1">
-                  <div className="grid grid-cols-2 gap-2 p-1">
-                    {TIME_SLOTS.map((time) => (
-                      <Button
-                        key={time}
-                        type="button"
-                        variant={field.value === time ? "default" : "outline"}
-                        className={cn(
-                          "text-left font-normal",
-                          field.value === time && "bg-primary text-primary-foreground"
-                        )}
-                        onClick={() => handleTimeSelect(time)}
-                      >
-                        {time} hrs
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </PopoverContent>
-            </Popover>
+            <Select
+              onValueChange={(value) => {
+                field.onChange(value);
+                console.log(`Selected time: ${value}`);
+              }}
+              value={field.value}
+            >
+              <FormControl>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccionar hora">
+                    {field.value ? `${field.value} hrs` : "Seleccionar hora"}
+                  </SelectValue>
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent className="max-h-[300px]">
+                {TIME_SLOTS.map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {time} hrs
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <FormMessage />
           </FormItem>
         );
