@@ -71,12 +71,25 @@ export const useProspects = () => {
     });
   };
 
+  // Filter prospects by search query
+  const filterProspects = (query: string) => {
+    if (!query.trim()) return prospects;
+    
+    return prospects.filter(prospect => 
+      prospect.name.toLowerCase().includes(query.toLowerCase()) ||
+      prospect.location.toLowerCase().includes(query.toLowerCase()) ||
+      prospect.phone.includes(query) ||
+      (prospect.priceRange && prospect.priceRange.toLowerCase().includes(query.toLowerCase()))
+    );
+  };
+
   return {
     prospects,
     loading,
     addProspect,
     updateProspect,
     updateProspectStatus,
-    deleteProspect
+    deleteProspect,
+    filterProspects
   };
 };

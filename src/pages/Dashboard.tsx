@@ -3,17 +3,31 @@ import MetricsCards from "@/components/dashboard/MetricsCards";
 import AppointmentsList from "@/components/dashboard/AppointmentsList";
 import RecentProspects from "@/components/dashboard/RecentProspects";
 import { useSearchContext } from "@/contexts/SearchContext";
+import { useProspects } from "@/hooks/useProspects";
+import { useState, useEffect } from "react";
 
 const Dashboard = () => {
   const { searchQuery } = useSearchContext();
+  const { prospects, loading } = useProspects();
+  const [metrics, setMetrics] = useState({
+    nuevos: 0,
+    contactados: 0,
+    citas: 0,
+    cerrados: 0
+  });
   
-  // Mock data
-  const metrics = {
-    nuevos: 8,
-    contactados: 15,
-    citas: 5,
-    cerrados: 3
-  };
+  // Calculate metrics based on prospect data
+  useEffect(() => {
+    if (prospects.length > 0) {
+      const newMetrics = {
+        nuevos: prospects.filter(p => p.status === "new").length,
+        contactados: prospects.filter(p => p.status === "contacted").length,
+        citas: prospects.filter(p => p.status === "appointment").length,
+        cerrados: prospects.filter(p => p.status === "closed").length
+      };
+      setMetrics(newMetrics);
+    }
+  }, [prospects]);
   
   const appointments = [
     { 
@@ -39,46 +53,6 @@ const Dashboard = () => {
     }
   ];
   
-  // Full prospect data with dates
-  const allProspects = [
-    { 
-      id: 1, 
-      name: "Carlos Vega", 
-      phone: "555-111-2222", 
-      location: "Col. Del Valle", 
-      priceRange: "$2M - $3M",
-      status: "new",
-      createdAt: new Date() // Today
-    },
-    { 
-      id: 2, 
-      name: "Ana Torres", 
-      phone: "555-333-4444", 
-      location: "Col. Narvarte", 
-      priceRange: "$1.5M - $2.5M",
-      status: "contacted",
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
-    },
-    { 
-      id: 3, 
-      name: "Javier Luna", 
-      phone: "555-555-6666", 
-      location: "Col. Escandón", 
-      priceRange: "$3M - $4M",
-      status: "appointment",
-      createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000) // 8 days ago
-    },
-    { 
-      id: 4, 
-      name: "Sofía García", 
-      phone: "555-777-8888", 
-      location: "Col. Juárez", 
-      priceRange: "$2.5M - $3.5M",
-      status: "closed",
-      createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000) // 20 days ago
-    }
-  ];
-
   // Filter data based on search query
   const filteredAppointments = appointments.filter(appointment => 
     searchQuery.trim() === "" || 
@@ -87,12 +61,12 @@ const Dashboard = () => {
     appointment.phone.includes(searchQuery)
   );
   
-  const filteredProspects = allProspects.filter(prospect => 
+  const filteredProspects = prospects.filter(prospect => 
     searchQuery.trim() === "" || 
     prospect.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     prospect.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
     prospect.phone.includes(searchQuery) ||
-    prospect.priceRange.toLowerCase().includes(searchQuery.toLowerCase())
+    (prospect.priceRange && prospect.priceRange.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -102,7 +76,7 @@ const Dashboard = () => {
       </div>
       
       {/* Metrics Cards */}
-      <MetricsCards metrics={metrics} />
+      <MetricsCards metrics={metrics} loading={loading} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Today's Appointments */}

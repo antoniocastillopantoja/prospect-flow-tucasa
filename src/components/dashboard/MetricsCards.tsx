@@ -1,6 +1,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Home, Phone, Users } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface MetricsCardsProps {
   metrics: {
@@ -9,66 +10,66 @@ interface MetricsCardsProps {
     citas: number;
     cerrados: number;
   };
+  loading?: boolean;
 }
 
-const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics }) => {
+const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false }) => {
+  const cards = [
+    {
+      title: "Nuevos Prospectos",
+      value: metrics.nuevos,
+      icon: Users,
+      color: "blue",
+      delay: "0ms"
+    },
+    {
+      title: "Contactados",
+      value: metrics.contactados,
+      icon: Phone,
+      color: "yellow",
+      delay: "150ms"
+    },
+    {
+      title: "Citas Agendadas",
+      value: metrics.citas,
+      icon: Calendar,
+      color: "purple",
+      delay: "300ms"
+    },
+    {
+      title: "Cerrados",
+      value: metrics.cerrados,
+      icon: Home,
+      color: "green",
+      delay: "450ms"
+    }
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="transition-all duration-300 hover:shadow-md transform hover:-translate-y-1 animate-fade-in" style={{ animationDelay: '0ms' }}>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm text-gray-500">Nuevos Prospectos</p>
-              <p className="text-2xl font-bold">{metrics.nuevos}</p>
+      {cards.map((card, index) => (
+        <Card 
+          key={index} 
+          className="transition-all duration-300 hover:shadow-md transform hover:-translate-y-1 animate-fade-in" 
+          style={{ animationDelay: card.delay }}
+        >
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-gray-500">{card.title}</p>
+                {loading ? (
+                  <Skeleton className="h-8 w-16 mt-1" />
+                ) : (
+                  <p className="text-2xl font-bold">{card.value}</p>
+                )}
+              </div>
+              <div className={`bg-${card.color}-100 p-2 rounded-full transition-all duration-200 hover:scale-110`}>
+                <card.icon className={`h-5 w-5 text-${card.color}-600`} />
+              </div>
             </div>
-            <div className="bg-blue-100 p-2 rounded-full transition-all duration-200 hover:scale-110">
-              <Users className="h-5 w-5 text-blue-600" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="transition-all duration-300 hover:shadow-md transform hover:-translate-y-1 animate-fade-in" style={{ animationDelay: '150ms' }}>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm text-gray-500">Contactados</p>
-              <p className="text-2xl font-bold">{metrics.contactados}</p>
-            </div>
-            <div className="bg-yellow-100 p-2 rounded-full transition-all duration-200 hover:scale-110">
-              <Phone className="h-5 w-5 text-yellow-600" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="transition-all duration-300 hover:shadow-md transform hover:-translate-y-1 animate-fade-in" style={{ animationDelay: '300ms' }}>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm text-gray-500">Citas Agendadas</p>
-              <p className="text-2xl font-bold">{metrics.citas}</p>
-            </div>
-            <div className="bg-purple-100 p-2 rounded-full transition-all duration-200 hover:scale-110">
-              <Calendar className="h-5 w-5 text-purple-600" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="transition-all duration-300 hover:shadow-md transform hover:-translate-y-1 animate-fade-in" style={{ animationDelay: '450ms' }}>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm text-gray-500">Cerrados</p>
-              <p className="text-2xl font-bold">{metrics.cerrados}</p>
-            </div>
-            <div className="bg-green-100 p-2 rounded-full transition-all duration-200 hover:scale-110">
-              <Home className="h-5 w-5 text-green-600" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };
