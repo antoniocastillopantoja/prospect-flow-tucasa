@@ -27,7 +27,7 @@ const ProspectDetail = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { prospects, updateProspect, updateProspectStatus } = useProspects();
+  const { prospects, updateProspect, updateProspectStatus, deleteProspect } = useProspects();
   
   const [activeTab, setActiveTab] = useState(initialTab);
   const [prospect, setProspect] = useState<any>(null);
@@ -84,6 +84,13 @@ const ProspectDetail = () => {
   const onAppointmentSubmit = (data: any) => {
     const tabToSwitch = handleAppointmentSubmit(data);
     setActiveTab(tabToSwitch);
+  };
+
+  const handleDeleteProspect = () => {
+    if (prospect && id) {
+      deleteProspect(parseInt(id));
+      navigate('/prospectos');
+    }
   };
 
   useEffect(() => {
@@ -173,6 +180,8 @@ const ProspectDetail = () => {
         onSubmit={prospectEditHook.handleSaveEdit}
         onCancel={prospectEditHook.closeEditDialog}
         isLoading={prospectEditHook.editLoading}
+        onDelete={handleDeleteProspect}
+        prospectId={prospect.id}
       />
       
       <AppointmentDialog 

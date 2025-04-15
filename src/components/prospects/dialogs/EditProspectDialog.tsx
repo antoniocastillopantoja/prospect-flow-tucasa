@@ -1,9 +1,21 @@
 
-import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import React, { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ProspectForm } from "@/components/prospects/ProspectForm";
 import { UseFormReturn } from "react-hook-form";
 import { ProspectFormData } from "@/types/prospects";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog";
 
 interface EditProspectDialogProps {
   isOpen: boolean;
@@ -12,6 +24,8 @@ interface EditProspectDialogProps {
   onSubmit: () => void;
   onCancel: () => void;
   isLoading: boolean;
+  onDelete?: () => void;
+  prospectId?: number;
 }
 
 const EditProspectDialog: React.FC<EditProspectDialogProps> = ({
@@ -20,22 +34,73 @@ const EditProspectDialog: React.FC<EditProspectDialogProps> = ({
   form,
   onSubmit,
   onCancel,
-  isLoading
+  isLoading,
+  onDelete,
+  prospectId
 }) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const handleDeleteClick = () => {
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (onDelete) {
+      onDelete();
+    }
+    setIsDeleteDialogOpen(false);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px]">
-        <DialogHeader>
-          <DialogTitle>Editar Prospecto</DialogTitle>
-        </DialogHeader>
-        <ProspectForm 
-          form={form}
-          onSubmit={onSubmit}
-          onCancel={onCancel}
-          isLoading={isLoading}
-        />
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-[800px]">
+          <DialogHeader>
+            <DialogTitle>Editar Prospecto</DialogTitle>
+            <DialogDescription>
+              Modifica la información del prospecto o haz clic en el botón de borrar para eliminarlo.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end mb-4">
+            <Button 
+              variant="destructive" 
+              onClick={handleDeleteClick}
+              className="flex items-center gap-2"
+            >
+              <Trash2 size={16} />
+              Borrar Prospecto
+            </Button>
+          </div>
+          <ProspectForm 
+            form={form}
+            onSubmit={onSubmit}
+            onCancel={onCancel}
+            isLoading={isLoading}
+          />
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente el prospecto
+              y toda la información relacionada con él.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
