@@ -19,6 +19,7 @@ import CalendarPage from "./pages/Calendar";
 import ReportsPage from "./pages/Reports";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Notifications from "./pages/Notifications";
 
 // Layout
 import AppLayout from "./components/AppLayout";
@@ -44,6 +45,7 @@ const App = () => (
                 <Route path="calendario" element={<CalendarPage />} />
                 <Route path="reportes" element={<ReportsPage />} />
                 <Route path="configuracion" element={<SettingsPage />} />
+                <Route path="notificaciones" element={<Notifications />} />
               </Route>
               
               <Route path="*" element={<NotFound />} />

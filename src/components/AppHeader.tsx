@@ -4,6 +4,8 @@ import { NotificationDropdown } from "@/components/header/NotificationDropdown";
 import { NewProspectButton } from "@/components/header/NewProspectButton";
 import { useLocation } from "react-router-dom";
 import { useSearchContext } from "@/contexts/SearchContext";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface AppHeaderProps {
   toggleSidebar: () => void;
@@ -25,7 +27,10 @@ export function AppHeader({ toggleSidebar }: AppHeaderProps) {
 
   return (
     <header className="border-b bg-background p-4 flex items-center justify-between">
-      <div className="flex-1">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" onClick={toggleSidebar} className="md:hidden">
+          <Menu className="h-5 w-5" />
+        </Button>
         <h1 className="text-lg font-bold text-primary">Tu Casa Ideal CRM</h1>
       </div>
       

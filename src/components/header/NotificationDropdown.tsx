@@ -7,8 +7,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigation } from "@/hooks/useNavigation";
 
 export function NotificationDropdown() {
+  const { goToNotifications } = useNavigation();
+  
+  const handleViewAllClick = () => {
+    goToNotifications();
+  };
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -31,7 +38,10 @@ export function NotificationDropdown() {
             <p className="text-sm text-gray-500">Roberto Sánchez - 3:00 PM</p>
           </div>
         </DropdownMenuItem>
-        <DropdownMenuItem className="py-2 text-center border-t cursor-pointer">
+        <DropdownMenuItem 
+          className="py-2 text-center border-t cursor-pointer"
+          onClick={handleViewAllClick}
+        >
           <span className="text-primary">Ver todas</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
