@@ -56,9 +56,14 @@ const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
                     key={time}
                     type="button"
                     variant={field.value === time ? "default" : "outline"}
-                    className="text-left font-normal"
+                    className={cn(
+                      "text-left font-normal w-full",
+                      field.value === time && "bg-primary text-primary-foreground"
+                    )}
                     onClick={() => {
                       field.onChange(time);
+                      // Cerrar el popover después de seleccionar
+                      document.body.click();
                     }}
                   >
                     {time} hrs
