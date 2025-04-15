@@ -28,20 +28,21 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointments }) => 
   };
 
   return (
-    <Card>
+    <Card className="transition-all duration-300 hover:shadow-md">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-medium">Citas de Hoy</CardTitle>
       </CardHeader>
       <CardContent>
         {appointments.length > 0 ? (
           <div className="space-y-4">
-            {appointments.map((appointment) => (
+            {appointments.map((appointment, index) => (
               <div 
                 key={appointment.id}
-                className="p-3 border rounded-lg hover:bg-gray-50 transition-colors flex justify-between items-center"
+                className="p-3 border rounded-lg hover:bg-gray-50 transition-all duration-200 flex justify-between items-center transform hover:-translate-y-1 animate-fade-in"
+                style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="flex items-center">
-                  <div className="bg-primary/10 p-2 rounded-full mr-3">
+                  <div className="bg-primary/10 p-2 rounded-full mr-3 transition-colors duration-200 group-hover:bg-primary/20">
                     <User className="h-4 w-4 text-primary" />
                   </div>
                   <div>
@@ -58,7 +59,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointments }) => 
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="flex items-center"
+                  className="flex items-center transition-all duration-200 hover:bg-primary hover:text-primary-foreground"
                   onClick={() => handleCall(appointment.phone, appointment.name)}
                 >
                   <Phone className="h-3 w-3 mr-1" />
@@ -68,7 +69,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointments }) => 
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 animate-fade-in">
             No tienes citas programadas para hoy
           </div>
         )}

@@ -42,7 +42,7 @@ const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
   });
 
   return (
-    <Card>
+    <Card className="transition-all duration-300 hover:shadow-md">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg font-medium">Prospectos Recientes</CardTitle>
@@ -58,10 +58,11 @@ const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
       <CardContent>
         {filteredProspects.length > 0 ? (
           <div className="space-y-4">
-            {filteredProspects.map((prospect) => (
+            {filteredProspects.map((prospect, index) => (
               <div 
                 key={prospect.id}
-                className="p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                className="p-3 border rounded-lg hover:bg-gray-50 transition-all duration-200 hover:shadow-sm transform hover:-translate-y-1 animate-fade-in"
+                style={{ animationDelay: `${index * 150}ms` }}
               >
                 <div className="flex justify-between items-start mb-1">
                   <p className="font-medium">{prospect.name}</p>
@@ -81,7 +82,7 @@ const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 animate-fade-in">
             No hay prospectos para este período
           </div>
         )}
