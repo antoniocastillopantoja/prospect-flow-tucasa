@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -50,14 +51,16 @@ const Dashboard = () => {
     });
   };
   
-  const prospects = [
+  // Full prospect data with dates
+  const allProspects = [
     { 
       id: 1, 
       name: "Carlos Vega", 
       phone: "555-111-2222", 
       location: "Col. Del Valle", 
       priceRange: "$2M - $3M",
-      status: "new"
+      status: "new",
+      createdAt: new Date() // Today
     },
     { 
       id: 2, 
@@ -65,7 +68,8 @@ const Dashboard = () => {
       phone: "555-333-4444", 
       location: "Col. Narvarte", 
       priceRange: "$1.5M - $2.5M",
-      status: "contacted"
+      status: "contacted",
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
     },
     { 
       id: 3, 
@@ -73,7 +77,8 @@ const Dashboard = () => {
       phone: "555-555-6666", 
       location: "Col. Escandón", 
       priceRange: "$3M - $4M",
-      status: "appointment"
+      status: "appointment",
+      createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000) // 8 days ago
     },
     { 
       id: 4, 
@@ -81,9 +86,29 @@ const Dashboard = () => {
       phone: "555-777-8888", 
       location: "Col. Juárez", 
       priceRange: "$2.5M - $3.5M",
-      status: "closed"
+      status: "closed",
+      createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000) // 20 days ago
     }
   ];
+  
+  // Filter prospects based on timeframe
+  const filteredProspects = allProspects.filter(prospect => {
+    const now = new Date();
+    const prospectDate = prospect.createdAt;
+    
+    switch(timeframe) {
+      case "hoy":
+        return prospectDate.toDateString() === now.toDateString();
+      case "semana":
+        const oneWeekAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+        return prospectDate >= oneWeekAgo;
+      case "mes":
+        const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+        return prospectDate >= oneMonthAgo;
+      default:
+        return true;
+    }
+  });
   
   const getStatusClass = (status: string) => {
     switch (status) {
@@ -236,31 +261,37 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {prospects.map((prospect) => (
-                <div 
-                  key={prospect.id}
-                  className="p-3 border rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <p className="font-medium">{prospect.name}</p>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(prospect.status)}`}>
-                      {getStatusText(prospect.status)}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500 space-x-3">
-                    <div className="flex items-center">
-                      <MapPin className="h-3 w-3 mr-1" />
-                      <span>{prospect.location}</span>
+            {filteredProspects.length > 0 ? (
+              <div className="space-y-4">
+                {filteredProspects.map((prospect) => (
+                  <div 
+                    key={prospect.id}
+                    className="p-3 border rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <p className="font-medium">{prospect.name}</p>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(prospect.status)}`}>
+                        {getStatusText(prospect.status)}
+                      </span>
                     </div>
-                    <div className="flex items-center">
-                      <Home className="h-3 w-3 mr-1" />
-                      <span>{prospect.priceRange}</span>
+                    <div className="flex items-center text-sm text-gray-500 space-x-3">
+                      <div className="flex items-center">
+                        <MapPin className="h-3 w-3 mr-1" />
+                        <span>{prospect.location}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Home className="h-3 w-3 mr-1" />
+                        <span>{prospect.priceRange}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                No hay prospectos para este período
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
