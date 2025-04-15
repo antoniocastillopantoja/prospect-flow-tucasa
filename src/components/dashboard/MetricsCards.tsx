@@ -2,6 +2,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Home, Phone, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
 
 interface MetricsCardsProps {
   metrics: {
@@ -14,34 +15,40 @@ interface MetricsCardsProps {
 }
 
 const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false }) => {
+  const navigate = useNavigate();
+
   const cards = [
     {
       title: "Nuevos Prospectos",
       value: metrics.nuevos,
       icon: Users,
       color: "blue",
-      delay: "0ms"
+      delay: "0ms",
+      onClick: () => navigate("/prospectos", { state: { filter: "new" } })
     },
     {
       title: "Contactados",
       value: metrics.contactados,
       icon: Phone,
-      color: "yellow", // Ensure this is used for background
-      delay: "150ms"
+      color: "yellow",
+      delay: "150ms",
+      onClick: () => navigate("/prospectos", { state: { filter: "contacted" } })
     },
     {
       title: "Citas Agendadas",
       value: metrics.citas,
       icon: Calendar,
       color: "purple",
-      delay: "300ms"
+      delay: "300ms",
+      onClick: () => navigate("/calendario")
     },
     {
       title: "Cerrados",
       value: metrics.cerrados,
       icon: Home,
       color: "green",
-      delay: "450ms"
+      delay: "450ms",
+      onClick: () => navigate("/prospectos", { state: { filter: "closed" } })
     }
   ];
 
@@ -50,8 +57,9 @@ const MetricsCards: React.FC<MetricsCardsProps> = ({ metrics, loading = false })
       {cards.map((card, index) => (
         <Card 
           key={index} 
-          className="transition-all duration-300 hover:shadow-md transform hover:-translate-y-1 animate-fade-in" 
+          className="transition-all duration-300 hover:shadow-md transform hover:-translate-y-1 animate-fade-in cursor-pointer" 
           style={{ animationDelay: card.delay }}
+          onClick={card.onClick}
         >
           <CardContent className="p-4">
             <div className="flex justify-between items-center">

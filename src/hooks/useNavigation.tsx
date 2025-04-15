@@ -12,13 +12,18 @@ export function useNavigation() {
     navigate("/notificaciones");
   };
 
-  const goToProspects = () => {
-    navigate("/prospectos");
+  const goToProspects = (filter?: string) => {
+    navigate("/prospectos", filter ? { state: { filter } } : undefined);
+  };
+
+  const goToCalendar = () => {
+    navigate("/calendario");
   };
 
   return {
     goToNewProspect,
     goToNotifications,
-    goToProspects
+    goToProspects,
+    goToCalendar
   };
 }
