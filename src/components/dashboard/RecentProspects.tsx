@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Home, MapPin } from "lucide-react";
+import ProspectStatusBadge from "@/components/ProspectStatusBadge";
 import "./dashboard.css";
 
 interface Prospect {
@@ -40,28 +41,6 @@ const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
     }
   });
 
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case "new": return "status-new";
-      case "contacted": return "status-contacted";
-      case "appointment": return "status-appointment";
-      case "canceled": return "status-canceled";
-      case "closed": return "status-closed";
-      default: return "";
-    }
-  };
-  
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "new": return "Nuevo";
-      case "contacted": return "Contactado";
-      case "appointment": return "Cita Agendada";
-      case "canceled": return "Cita Cancelada";
-      case "closed": return "Cliente Cerrado";
-      default: return status;
-    }
-  };
-
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -86,9 +65,7 @@ const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
               >
                 <div className="flex justify-between items-start mb-1">
                   <p className="font-medium">{prospect.name}</p>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusClass(prospect.status)}`}>
-                    {getStatusText(prospect.status)}
-                  </span>
+                  <ProspectStatusBadge status={prospect.status as any} />
                 </div>
                 <div className="flex items-center text-sm text-gray-500 space-x-3">
                   <div className="flex items-center">

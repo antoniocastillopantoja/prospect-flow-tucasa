@@ -1,5 +1,6 @@
 
 import React from "react";
+import "@/components/dashboard/dashboard.css"; // Import CSS classes
 
 type StatusType = "new" | "contacted" | "appointment" | "canceled" | "closed";
 
@@ -9,13 +10,14 @@ interface ProspectStatusBadgeProps {
 }
 
 const ProspectStatusBadge: React.FC<ProspectStatusBadgeProps> = ({ status, className = "" }) => {
+  // Use the CSS classes defined in dashboard.css
   const getStatusClass = (status: StatusType) => {
     switch (status) {
-      case "new": return "bg-blue-100 text-blue-800";
-      case "contacted": return "bg-yellow-100 text-yellow-800";
-      case "appointment": return "bg-purple-100 text-purple-800";
-      case "canceled": return "bg-red-100 text-red-800";
-      case "closed": return "bg-green-100 text-green-800";
+      case "new": return "status-new";
+      case "contacted": return "status-contacted";
+      case "appointment": return "status-appointment";
+      case "canceled": return "status-canceled";
+      case "closed": return "status-closed";
       default: return "";
     }
   };
