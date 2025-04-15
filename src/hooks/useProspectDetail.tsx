@@ -39,9 +39,9 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     }
   };
 
-  const onAppointmentSubmit = (data: any) => {
-    const tabToSwitch = handleAppointmentSubmit(data);
-    return tabToSwitch;
+  // Ensure this function returns the promise from handleAppointmentSubmit
+  const onAppointmentSubmit = async (data: any) => {
+    return await handleAppointmentSubmit(data);
   };
 
   const handleDeleteProspect = () => {

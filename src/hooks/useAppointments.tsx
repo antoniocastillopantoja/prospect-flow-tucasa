@@ -30,7 +30,8 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
     setIsSchedulingAppointment(false);
   };
 
-  const handleAppointmentSubmit = async (data: any) => {
+  // This function now clearly returns a Promise<string> 
+  const handleAppointmentSubmit = async (data: any): Promise<string> => {
     setAppointmentLoading(true);
     
     try {
@@ -65,7 +66,7 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
         location: data.location,
         type: data.type,
         notes: data.notes,
-        status: "scheduled" as const,
+        status: "scheduled",
         googleCalendarEventId
       };
       

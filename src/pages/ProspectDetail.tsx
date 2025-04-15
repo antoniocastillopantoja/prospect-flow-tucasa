@@ -10,6 +10,7 @@ import { useProspectDetail } from "@/hooks/useProspectDetail";
 import ProspectDetailLoading from "@/components/prospects/ProspectDetailLoading";
 import ProspectDetailContent from "@/components/prospects/ProspectDetailContent";
 import ProspectDetailDialogs from "@/components/prospects/ProspectDetailDialogs";
+import { Appointment } from "@/hooks/useAppointments";
 
 const ProspectDetail = () => {
   const navigate = useNavigate();
@@ -34,14 +35,15 @@ const ProspectDetail = () => {
     }
   ];
 
-  const initialAppointments = [
+  // Fix the type by explicitly setting the status as a literal type
+  const initialAppointments: Appointment[] = [
     {
       id: 1,
       date: "2025-04-12",
       time: "11:00 AM",
       location: "Propiedad en Av. División del Norte 1234",
       type: "visita",
-      status: "scheduled"
+      status: "scheduled" // Explicitly use the literal type
     }
   ];
 
@@ -63,9 +65,12 @@ const ProspectDetail = () => {
   } = useProspectDetail(initialNotes, initialAppointments);
 
   // Handle appointment submission and tab switching
-  const handleAppointmentSubmit = (data: any) => {
-    const tabToSwitch = onAppointmentSubmit(data);
-    setActiveTab(tabToSwitch);
+  // Fix the Promise issue by properly handling the async result
+  const handleAppointmentSubmit = async (data: any) => {
+    const tabToSwitch = await onAppointmentSubmit(data);
+    if (tabToSwitch) {
+      setActiveTab(tabToSwitch);
+    }
   };
 
   if (loading || !prospect) {
