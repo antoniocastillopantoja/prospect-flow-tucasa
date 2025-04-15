@@ -30,7 +30,14 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({ appointments }) => 
   return (
     <Card className="transition-all duration-300 hover:shadow-md">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">Citas de Hoy</CardTitle>
+        <CardTitle className="text-lg font-medium">
+          Citas de Hoy
+          {appointments.length > 0 && (
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              ({appointments.length})
+            </span>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {appointments.length > 0 ? (

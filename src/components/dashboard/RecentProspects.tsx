@@ -45,7 +45,14 @@ const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
     <Card className="transition-all duration-300 hover:shadow-md">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-lg font-medium">Prospectos Recientes</CardTitle>
+          <CardTitle className="text-lg font-medium">
+            Prospectos Recientes
+            {allProspects.length !== filteredProspects.length && (
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                ({filteredProspects.length} de {allProspects.length})
+              </span>
+            )}
+          </CardTitle>
           <Tabs value={timeframe} onValueChange={setTimeframe} className="w-fit">
             <TabsList className="h-8">
               <TabsTrigger value="hoy" className="text-xs px-3">Hoy</TabsTrigger>

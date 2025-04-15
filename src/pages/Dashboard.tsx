@@ -3,8 +3,12 @@ import { useState } from "react";
 import MetricsCards from "@/components/dashboard/MetricsCards";
 import AppointmentsList from "@/components/dashboard/AppointmentsList";
 import RecentProspects from "@/components/dashboard/RecentProspects";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 const Dashboard = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  
   // Mock data
   const metrics = {
     nuevos: 8,
@@ -77,10 +81,37 @@ const Dashboard = () => {
     }
   ];
 
+  // Filter data based on search query
+  const filteredAppointments = appointments.filter(appointment => 
+    searchQuery.trim() === "" || 
+    appointment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    appointment.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    appointment.phone.includes(searchQuery)
+  );
+  
+  const filteredProspects = allProspects.filter(prospect => 
+    searchQuery.trim() === "" || 
+    prospect.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    prospect.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    prospect.phone.includes(searchQuery) ||
+    prospect.priceRange.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="animate-fade-in">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Panel de Control</h1>
+        
+        {/* Search box */}
+        <div className="relative w-64">
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input 
+            placeholder="Buscar prospectos o citas..." 
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
       
       {/* Metrics Cards */}
@@ -88,10 +119,10 @@ const Dashboard = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Today's Appointments */}
-        <AppointmentsList appointments={appointments} />
+        <AppointmentsList appointments={filteredAppointments} />
         
         {/* Recent Prospects */}
-        <RecentProspects allProspects={allProspects} />
+        <RecentProspects allProspects={filteredProspects} />
       </div>
     </div>
   );
