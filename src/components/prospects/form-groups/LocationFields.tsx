@@ -1,6 +1,12 @@
 
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -9,47 +15,55 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { sectors } from "@/models/Prospect";
+import { UseFormReturn } from "react-hook-form";
 import { ProspectFormData } from "@/types/prospects";
 
 interface LocationFieldsProps {
-  formData: Pick<ProspectFormData, "sector" | "location">;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
+  form: UseFormReturn<ProspectFormData>;
 }
 
-export function LocationFields({ 
-  formData, 
-  handleInputChange, 
-  handleSelectChange 
-}: LocationFieldsProps) {
+export function LocationFields({ form }: LocationFieldsProps) {
   return (
     <div className="space-y-4">
-      <div>
-        <Label htmlFor="sector">Sector</Label>
-        <Select 
-          value={formData.sector} 
-          onValueChange={(value) => handleSelectChange("sector", value)}
-        >
-          <SelectTrigger id="sector">
-            <SelectValue placeholder="Selecciona un sector" />
-          </SelectTrigger>
-          <SelectContent>
-            {sectors.map(sector => (
-              <SelectItem key={sector} value={sector}>{sector}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <FormField
+        control={form.control}
+        name="sector"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Sector</FormLabel>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona un sector" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {sectors.map(sector => (
+                  <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       
-      <div>
-        <Label htmlFor="location">Colonia</Label>
-        <Input
-          id="location"
-          name="location"
-          value={formData.location}
-          onChange={handleInputChange}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="location"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Colonia</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }

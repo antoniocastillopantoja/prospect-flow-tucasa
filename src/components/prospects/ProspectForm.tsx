@@ -1,6 +1,8 @@
 
 import { Button } from "@/components/ui/button";
 import { CardContent, CardFooter } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
+import { UseFormReturn } from "react-hook-form";
 import { ProspectFormData } from "@/types/prospects";
 
 // Import the field group components
@@ -11,66 +13,45 @@ import { AssignmentFields } from "./form-groups/AssignmentFields";
 import { NotesField } from "./form-groups/NotesField";
 
 interface ProspectFormProps {
-  onSubmit: (e: React.FormEvent) => void;
+  form: UseFormReturn<ProspectFormData>;
+  onSubmit: () => void;
   onCancel: () => void;
-  formData: ProspectFormData;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
   isLoading: boolean;
 }
 
 export function ProspectForm({
+  form,
   onSubmit,
   onCancel,
-  formData,
-  handleInputChange,
-  handleSelectChange,
   isLoading
 }: ProspectFormProps) {
   return (
-    <form onSubmit={onSubmit}>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <PersonalInfoFields 
-              formData={formData} 
-              handleInputChange={handleInputChange} 
-            />
+    <Form {...form}>
+      <form onSubmit={onSubmit}>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <PersonalInfoFields form={form} />
+              <LocationFields form={form} />
+            </div>
             
-            <LocationFields 
-              formData={formData}
-              handleInputChange={handleInputChange}
-              handleSelectChange={handleSelectChange}
-            />
+            <div className="space-y-4">
+              <PriceRangeFields form={form} />
+              <AssignmentFields form={form} />
+              <NotesField form={form} />
+            </div>
           </div>
-          
-          <div className="space-y-4">
-            <PriceRangeFields 
-              formData={formData} 
-              handleInputChange={handleInputChange} 
-            />
-            
-            <AssignmentFields 
-              formData={formData}
-              handleSelectChange={handleSelectChange}
-            />
-            
-            <NotesField 
-              notes={formData.notes}
-              handleInputChange={handleInputChange}
-            />
-          </div>
-        </div>
-      </CardContent>
-      
-      <CardFooter className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Guardando..." : "Guardar Prospecto"}
-        </Button>
-      </CardFooter>
-    </form>
+        </CardContent>
+        
+        <CardFooter className="flex justify-between">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? "Guardando..." : "Guardar Prospecto"}
+          </Button>
+        </CardFooter>
+      </form>
+    </Form>
   );
 }

@@ -1,48 +1,57 @@
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { UseFormReturn } from "react-hook-form";
 import { ProspectFormData } from "@/types/prospects";
 
 interface PersonalInfoFieldsProps {
-  formData: Pick<ProspectFormData, "name" | "phone" | "email">;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  form: UseFormReturn<ProspectFormData>;
 }
 
-export function PersonalInfoFields({ formData, handleInputChange }: PersonalInfoFieldsProps) {
+export function PersonalInfoFields({ form }: PersonalInfoFieldsProps) {
   return (
     <div className="space-y-4">
-      <div>
-        <Label htmlFor="name">Nombre completo</Label>
-        <Input
-          id="name"
-          name="name"
-          required
-          value={formData.name}
-          onChange={handleInputChange}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Nombre completo</FormLabel>
+            <FormControl>
+              <Input required {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       
-      <div>
-        <Label htmlFor="phone">Teléfono</Label>
-        <Input
-          id="phone"
-          name="phone"
-          required
-          value={formData.phone}
-          onChange={handleInputChange}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="phone"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Teléfono</FormLabel>
+            <FormControl>
+              <Input required {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       
-      <div>
-        <Label htmlFor="email">Correo electrónico</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleInputChange}
-        />
-      </div>
+      <FormField
+        control={form.control}
+        name="email"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Correo electrónico</FormLabel>
+            <FormControl>
+              <Input type="email" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }

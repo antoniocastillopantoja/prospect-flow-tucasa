@@ -3,74 +3,83 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProspects } from "@/hooks/useProspects";
 import { ProspectFormData } from "@/types/prospects";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useToast } from "@/hooks/use-toast";
+
+// Define the validation schema using zod
+const prospectFormSchema = z.object({
+  name: z.string().min(1, { message: "El nombre es obligatorio" }),
+  phone: z.string().min(1, { message: "El teléfono es obligatorio" }),
+  email: z.string().email({ message: "Email inválido" }).or(z.string().length(0)),
+  location: z.string(),
+  sector: z.string(),
+  minPrice: z.string(),
+  maxPrice: z.string(),
+  creditType: z.string(),
+  assignedTo: z.string(),
+  notes: z.string()
+});
 
 export function useProspectForm() {
   const navigate = useNavigate();
   const { addProspect } = useProspects();
+  const { toast } = useToast();
   
-  const [formData, setFormData] = useState<ProspectFormData>({
-    name: "",
-    phone: "",
-    email: "",
-    location: "",
-    sector: "",
-    minPrice: "",
-    maxPrice: "",
-    creditType: "",
-    assignedTo: "",
-    notes: ""
+  const form = useForm<ProspectFormData>({
+    resolver: zodResolver(prospectFormSchema),
+    defaultValues: {
+      name: "",
+      phone: "",
+      email: "",
+      location: "",
+      sector: "",
+      minPrice: "",
+      maxPrice: "",
+      creditType: "",
+      assignedTo: "",
+      notes: ""
+    },
   });
   
   const [isLoading, setIsLoading] = useState(false);
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-  
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-  
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = form.handleSubmit((data) => {
     setIsLoading(true);
     
-    const priceRange = formData.minPrice && formData.maxPrice 
-      ? `$${formData.minPrice}M - $${formData.maxPrice}M` 
+    const priceRange = data.minPrice && data.maxPrice 
+      ? `$${data.minPrice}M - $${data.maxPrice}M` 
       : "";
     
     addProspect({
-      name: formData.name,
-      phone: formData.phone,
-      email: formData.email || undefined,
-      location: formData.location,
-      sector: formData.sector,
+      name: data.name,
+      phone: data.phone,
+      email: data.email || undefined,
+      location: data.location,
+      sector: data.sector,
       priceRange,
-      creditType: formData.creditType,
+      creditType: data.creditType,
       contactDate: new Date().toISOString().split('T')[0],
-      agent: formData.assignedTo,
+      agent: data.assignedTo,
       status: "new",
-      notes: formData.notes
+      notes: data.notes
+    });
+    
+    toast({
+      title: "Prospecto creado",
+      description: `${data.name} ha sido registrado correctamente.`
     });
     
     setTimeout(() => {
       setIsLoading(false);
       navigate("/prospectos");
     }, 500);
-  };
+  });
 
   return {
-    formData,
+    form,
     isLoading,
-    handleInputChange,
-    handleSelectChange,
     handleSubmit,
     navigateBack: () => navigate("/prospectos")
   };

@@ -12,10 +12,8 @@ import { useProspectForm } from "@/hooks/useProspectForm";
 
 const NewProspect = () => {
   const {
-    formData,
+    form,
     isLoading,
-    handleInputChange,
-    handleSelectChange,
     handleSubmit,
     navigateBack
   } = useProspectForm();
@@ -39,10 +37,8 @@ const NewProspect = () => {
         </CardHeader>
         
         <ProspectForm
-          formData={formData}
+          form={form}
           isLoading={isLoading}
-          handleInputChange={handleInputChange}
-          handleSelectChange={handleSelectChange}
           onSubmit={handleSubmit}
           onCancel={navigateBack}
         />
