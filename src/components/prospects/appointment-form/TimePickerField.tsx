@@ -61,11 +61,13 @@ const TimePickerField: React.FC<TimePickerFieldProps> = ({ control, name }) => {
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent
-                className="w-auto p-2"
+                className="w-[280px] p-0"
                 align="start"
+                sideOffset={5}
+                style={{ zIndex: 9999 }}
               >
-                <ScrollArea className="h-[300px]">
-                  <div className="grid grid-cols-2 gap-2">
+                <ScrollArea className="h-[280px] p-1">
+                  <div className="grid grid-cols-2 gap-2 p-1">
                     {TIME_SLOTS.map((time) => (
                       <Button
                         key={time}
