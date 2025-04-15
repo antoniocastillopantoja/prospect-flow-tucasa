@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Calendar, MapPin, Phone } from "lucide-react";
+import { ArrowLeft, Calendar, Edit, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Prospect } from "@/models/Prospect";
 import ProspectStatusSelector from "./ProspectStatusSelector";
@@ -10,12 +10,14 @@ interface ProspectHeaderProps {
   prospect: Prospect;
   onStatusChange: (status: string) => void;
   onScheduleAppointment: () => void;
+  onEdit: () => void;
 }
 
 const ProspectHeader: React.FC<ProspectHeaderProps> = ({ 
   prospect, 
   onStatusChange, 
-  onScheduleAppointment 
+  onScheduleAppointment,
+  onEdit
 }) => {
   const navigate = useNavigate();
   
@@ -52,6 +54,14 @@ const ProspectHeader: React.FC<ProspectHeaderProps> = ({
             onClick={() => window.location.href = `tel:${prospect.phone}`}
           >
             <Phone className="h-4 w-4 mr-2" /> Llamar
+          </Button>
+          
+          <Button 
+            variant="outline"
+            className="flex items-center"
+            onClick={onEdit}
+          >
+            <Edit className="h-4 w-4 mr-2" /> Editar
           </Button>
           
           <Button 
