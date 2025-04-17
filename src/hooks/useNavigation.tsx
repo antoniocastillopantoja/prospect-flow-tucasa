@@ -20,10 +20,15 @@ export function useNavigation() {
     navigate("/calendario");
   };
 
+  const goToProspect = (id: string) => {
+    navigate(`/prospectos/${id}`);
+  };
+
   return {
     goToNewProspect,
     goToNotifications,
     goToProspects,
-    goToCalendar
+    goToCalendar,
+    goToProspect
   };
 }

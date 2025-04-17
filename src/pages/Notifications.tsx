@@ -1,6 +1,8 @@
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useState } from "react";
+import { useNavigation } from "@/hooks/useNavigation";
+import { useToast } from "@/hooks/use-toast";
 
 interface Notification {
   id: number;
@@ -8,9 +10,14 @@ interface Notification {
   description: string;
   time: string;
   read: boolean;
+  action?: string;
+  actionId?: string;
 }
 
 const Notifications = () => {
+  const { goToProspect, goToCalendar } = useNavigation();
+  const { toast } = useToast();
+  
   // Mock notifications data - in a real app, this would come from an API
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -18,37 +25,65 @@ const Notifications = () => {
       title: "Nuevo prospecto registrado",
       description: "María Gómez",
       time: "Hace 5 minutos",
-      read: false
+      read: false,
+      action: "prospect",
+      actionId: "prospecto-123"
     },
     {
       id: 2,
       title: "Cita agendada para hoy",
       description: "Roberto Sánchez",
       time: "3:00 PM",
-      read: false
+      read: false,
+      action: "calendar"
     },
     {
       id: 3,
       title: "Prospecto actualizado",
       description: "Carlos Vega",
       time: "Hace 1 hora",
-      read: true
+      read: true,
+      action: "prospect",
+      actionId: "prospecto-456"
     },
     {
       id: 4,
       title: "Cita cancelada",
       description: "Laura Martínez",
       time: "Hace 2 horas",
-      read: true
+      read: true,
+      action: "calendar"
     },
     {
       id: 5,
       title: "Prospecto cerrado exitosamente",
       description: "Javier Luna",
       time: "Hace 1 día",
-      read: true
+      read: true,
+      action: "prospect",
+      actionId: "prospecto-789"
     }
   ]);
+
+  const handleNotificationClick = (notification: Notification) => {
+    // Marcar como leída
+    markAsRead(notification.id);
+    
+    // Ejecutar acción asociada
+    if (notification.action === "prospect" && notification.actionId) {
+      goToProspect(notification.actionId);
+      toast({
+        title: "Navegando al prospecto",
+        description: `Abriendo detalles de ${notification.description}`,
+      });
+    } else if (notification.action === "calendar") {
+      goToCalendar();
+      toast({
+        title: "Navegando al calendario",
+        description: "Mostrando las citas programadas",
+      });
+    }
+  };
 
   const markAsRead = (id: number) => {
     setNotifications(
@@ -78,8 +113,8 @@ const Notifications = () => {
             {notifications.map((notification) => (
               <TableRow 
                 key={notification.id}
-                className={notification.read ? "bg-white" : "bg-blue-50"}
-                onClick={() => markAsRead(notification.id)}
+                className={`${notification.read ? "bg-white" : "bg-blue-50"} cursor-pointer hover:bg-gray-50`}
+                onClick={() => handleNotificationClick(notification)}
               >
                 <TableCell className="font-medium">{notification.title}</TableCell>
                 <TableCell>{notification.description}</TableCell>
