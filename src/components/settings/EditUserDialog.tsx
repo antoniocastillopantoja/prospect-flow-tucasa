@@ -1,13 +1,15 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@/types/settings";
 import { useToast } from "@/hooks/use-toast";
+import { generateTemporaryPassword } from "@/utils/passwordUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Eye, EyeOff, RefreshCw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -35,7 +37,8 @@ import {
 export const userEditSchema = z.object({
   name: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
   email: z.string().email({ message: "Correo electrónico inválido" }),
-  role: z.string({ required_error: "Por favor selecciona un rol" })
+  role: z.string({ required_error: "Por favor selecciona un rol" }),
+  temporaryPassword: z.string().optional()
 });
 
 export type UserEditValues = z.infer<typeof userEditSchema>;
@@ -50,20 +53,49 @@ interface EditUserDialogProps {
 export const EditUserDialog = ({ user, open, onOpenChange, onUpdateUser }: EditUserDialogProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasTempPassword, setHasTempPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [temporaryPassword, setTemporaryPassword] = useState("");
   
   const form = useForm<UserEditValues>({
     resolver: zodResolver(userEditSchema),
     defaultValues: {
       name: user?.name || "",
       email: user?.email || "",
-      role: user?.role.toLowerCase() || ""
+      role: user?.role.toLowerCase() || "",
+      temporaryPassword: ""
     },
     values: {
       name: user?.name || "",
       email: user?.email || "",
-      role: user?.role.toLowerCase() || ""
+      role: user?.role.toLowerCase() || "",
+      temporaryPassword: temporaryPassword || ""
     }
   });
+
+  // Check if the user has a temporary password
+  useEffect(() => {
+    if (user?.email) {
+      const tempPasswords = JSON.parse(localStorage.getItem("tempPasswords") || "{}");
+      const hasTemp = !!tempPasswords[user.email];
+      setHasTempPassword(hasTemp);
+      
+      if (hasTemp) {
+        setTemporaryPassword(tempPasswords[user.email]);
+        form.setValue("temporaryPassword", tempPasswords[user.email]);
+      }
+    }
+  }, [user?.email, form]);
+
+  const generateNewPassword = () => {
+    const newPassword = generateTemporaryPassword();
+    setTemporaryPassword(newPassword);
+    form.setValue("temporaryPassword", newPassword);
+  };
+  
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (data: UserEditValues) => {
     if (!user) return;
@@ -72,6 +104,14 @@ export const EditUserDialog = ({ user, open, onOpenChange, onUpdateUser }: EditU
     try {
       // Update user data
       onUpdateUser(user.id, data);
+      
+      // Update temporary password in localStorage if provided
+      if (data.temporaryPassword) {
+        const tempPasswords = JSON.parse(localStorage.getItem("tempPasswords") || "{}");
+        tempPasswords[data.email] = data.temporaryPassword;
+        localStorage.setItem("tempPasswords", JSON.stringify(tempPasswords));
+        setHasTempPassword(true);
+      }
       
       // Show success toast
       toast({
@@ -162,6 +202,54 @@ export const EditUserDialog = ({ user, open, onOpenChange, onUpdateUser }: EditU
                   </FormItem>
                 )}
               />
+              
+              {hasTempPassword && (
+                <FormField
+                  control={form.control}
+                  name="temporaryPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="temporaryPassword">Contraseña temporal</Label>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={generateNewPassword}
+                          className="h-7 px-2"
+                        >
+                          <RefreshCw className="h-3.5 w-3.5 mr-1" /> Regenerar
+                        </Button>
+                      </div>
+                      <div className="relative">
+                        <FormControl>
+                          <Input 
+                            id="temporaryPassword" 
+                            type={showPassword ? "text" : "password"}
+                            {...field}
+                          />
+                        </FormControl>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={togglePasswordVisibility}
+                          className="absolute right-0 top-0 h-full px-3"
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        El usuario deberá cambiar esta contraseña en su primer inicio de sesión
+                      </p>
+                    </FormItem>
+                  )}
+                />
+              )}
               
               <DialogFooter>
                 <Button
