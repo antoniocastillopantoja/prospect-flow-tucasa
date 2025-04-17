@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon, MapPin, Clock, User, Search, SortAsc, SortDesc, Filter } from "lucide-react";
+import { CalendarIcon, MapPin, Clock, User, Search, SortAsc, SortDesc, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Appointment } from "@/hooks/useCalendarPage";
@@ -28,17 +28,31 @@ import {
   SortOption,
   SortDirection
 } from "@/utils/appointmentUtils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AppointmentsListProps {
   date: Date | undefined;
   appointments: Appointment[];
   onGoToClient: (clientId: string) => void;
+  onCompleteAppointment?: (id: number) => void;
+  onCancelAppointment?: (id: number) => void;
 }
 
 const AppointmentsList: React.FC<AppointmentsListProps> = ({
   date,
   appointments,
-  onGoToClient
+  onGoToClient,
+  onCompleteAppointment,
+  onCancelAppointment
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string | null>(null);
@@ -46,6 +60,10 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>(appointments);
   const uniqueTypes = getUniqueAppointmentTypes(appointments);
+  
+  // Estado para el diálogo de confirmación de cancelación
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [appointmentToCancel, setAppointmentToCancel] = useState<number | null>(null);
   
   useEffect(() => {
     let result = [...appointments];
@@ -73,6 +91,26 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
       setSortBy(option);
       setSortDirection("asc");
     }
+  };
+
+  // Manejadores para los botones de completar y cancelar
+  const handleComplete = (id: number) => {
+    if (onCompleteAppointment) {
+      onCompleteAppointment(id);
+    }
+  };
+
+  const handleCancelClick = (id: number) => {
+    setAppointmentToCancel(id);
+    setCancelDialogOpen(true);
+  };
+
+  const handleConfirmCancel = () => {
+    if (appointmentToCancel !== null && onCancelAppointment) {
+      onCancelAppointment(appointmentToCancel);
+      setAppointmentToCancel(null);
+    }
+    setCancelDialogOpen(false);
   };
 
   return (
@@ -103,7 +141,7 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
             
             <Select
               value={typeFilter || ""}
-              onValueChange={(value) => setTypeFilter(value || null)}
+              onValueChange={(value) => setTypeFilter(value === "all" ? null : value)}
             >
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Filtrar por tipo" />
@@ -172,12 +210,36 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50">
-                      Completada
-                    </Button>
-                    <Button size="sm" variant="outline" className="text-red-600 border-red-600 hover:bg-red-50">
-                      Cancelar
-                    </Button>
+                    {appointment.status === "scheduled" ? (
+                      <>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-green-600 border-green-600 hover:bg-green-50"
+                          onClick={() => handleComplete(appointment.id)}
+                        >
+                          <Check className="h-4 w-4 mr-1" />
+                          Completada
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                          onClick={() => handleCancelClick(appointment.id)}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Cancelar
+                        </Button>
+                      </>
+                    ) : (
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        appointment.status === "completed" 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-red-100 text-red-800"
+                      }`}>
+                        {appointment.status === "completed" ? "Completada" : "Cancelada"}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -191,6 +253,24 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
           </div>
         )}
       </CardContent>
+
+      {/* Diálogo de confirmación para cancelar cita */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción cancelará la cita y no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmCancel} className="bg-red-600 hover:bg-red-700">
+              Confirmar cancelación
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };

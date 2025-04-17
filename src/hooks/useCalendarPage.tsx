@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { useNavigation } from "@/hooks/useNavigation";
+import { useToast } from "@/hooks/use-toast";
 
 export interface Appointment {
   id: number;
@@ -18,6 +19,7 @@ export interface Appointment {
 export function useCalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { goToProspect } = useNavigation();
+  const { toast } = useToast();
   
   // Datos de ejemplo para las citas
   const [appointments, setAppointments] = useState<Appointment[]>([
@@ -79,12 +81,45 @@ export function useCalendarPage() {
     }
   };
 
+  // Nuevas funciones para manejar el cambio de estado de las citas
+  const completeAppointment = (appointmentId: number) => {
+    setAppointments(prevAppointments =>
+      prevAppointments.map(appointment => 
+        appointment.id === appointmentId 
+          ? { ...appointment, status: "completed" } 
+          : appointment
+      )
+    );
+    
+    toast({
+      title: "Cita completada",
+      description: "La cita ha sido marcada como completada exitosamente."
+    });
+  };
+
+  const cancelAppointment = (appointmentId: number) => {
+    setAppointments(prevAppointments =>
+      prevAppointments.map(appointment => 
+        appointment.id === appointmentId 
+          ? { ...appointment, status: "canceled" } 
+          : appointment
+      )
+    );
+    
+    toast({
+      title: "Cita cancelada",
+      description: "La cita ha sido cancelada exitosamente."
+    });
+  };
+
   return {
     date,
     setDate,
     appointments,
     selectedDateAppointments,
     getDateWithAppointments,
-    handleGoToClient
+    handleGoToClient,
+    completeAppointment,
+    cancelAppointment
   };
 }

@@ -11,7 +11,9 @@ const CalendarPage = () => {
     appointments, 
     selectedDateAppointments, 
     getDateWithAppointments,
-    handleGoToClient
+    handleGoToClient,
+    completeAppointment,
+    cancelAppointment
   } = useCalendarPage();
   const { toast } = useToast();
 
@@ -33,6 +35,8 @@ const CalendarPage = () => {
           date={date}
           appointments={selectedDateAppointments}
           onGoToClient={handleGoToClient}
+          onCompleteAppointment={completeAppointment}
+          onCancelAppointment={cancelAppointment}
         />
       </div>
     </div>
