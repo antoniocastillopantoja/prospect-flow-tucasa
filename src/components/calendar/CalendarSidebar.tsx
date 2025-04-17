@@ -89,8 +89,20 @@ const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
               return (
                 <div 
                   key={dayOffset}
-                  className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 rounded-md cursor-pointer"
-                  onClick={() => onDateSelect(new Date(dayDate))}
+                  className={`flex justify-between items-center text-sm p-2 hover:bg-gray-50 rounded-md cursor-pointer ${
+                    date && 
+                    date.getDate() === dayDate.getDate() && 
+                    date.getMonth() === dayDate.getMonth() && 
+                    date.getFullYear() === dayDate.getFullYear() 
+                      ? 'bg-blue-50 border border-blue-200' 
+                      : ''
+                  }`}
+                  onClick={() => {
+                    // Only select the date if there's at least one appointment
+                    if (dayAppointments.length > 0) {
+                      onDateSelect(new Date(dayDate));
+                    }
+                  }}
                 >
                   <span className="flex items-center gap-1">
                     {dayStr}
@@ -98,7 +110,20 @@ const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
                       <CalendarCheck className="h-4 w-4 text-blue-600" />
                     )}
                   </span>
-                  <span className={`px-2 py-1 ${dayAppointments.length > 0 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} rounded-full text-xs`}>
+                  <span 
+                    className={`px-2 py-1 ${
+                      dayAppointments.length > 0 
+                        ? 'bg-blue-100 text-blue-800 cursor-pointer' 
+                        : 'bg-gray-100 text-gray-800'
+                    } rounded-full text-xs`}
+                    onClick={(e) => {
+                      // Prevent the parent onClick from firing
+                      if (dayAppointments.length > 0) {
+                        e.stopPropagation();
+                        onDateSelect(new Date(dayDate));
+                      }
+                    }}
+                  >
                     {dayAppointments.length} {dayAppointments.length === 1 ? 'cita' : 'citas'}
                   </span>
                 </div>
