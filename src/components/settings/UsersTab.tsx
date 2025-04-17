@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Card, 
@@ -9,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { UserForm, UserFormValues } from "./UserForm";
-import { UserList } from "./UserList";
+import { UserList } from "./users/UserList";
 import { User } from "@/types/settings";
 import { UserEditValues } from "./EditUserDialog";
 
