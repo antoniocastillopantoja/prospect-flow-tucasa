@@ -1,22 +1,17 @@
 
 import { useState } from "react";
-import { Calendar as CalendarIcon, Plus, MapPin, Clock, User } from "lucide-react";
+import { Calendar as CalendarIcon, MapPin, Clock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import NewAppointmentDialog from "@/components/calendar/NewAppointmentDialog";
-import { useCalendarIntegration } from "@/hooks/useCalendarIntegration";
 import { useNavigation } from "@/hooks/useNavigation";
 
 const CalendarPage = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { createGoogleCalendarEvent, isGoogleCalendarSyncing } = useCalendarIntegration();
   const { goToProspect } = useNavigation();
   
   // Datos de ejemplo para las citas
@@ -56,82 +51,6 @@ const CalendarPage = () => {
     }
   ]);
 
-  const handleOpenNewAppointment = () => {
-    setIsNewAppointmentOpen(true);
-  };
-
-  const handleCancelNewAppointment = () => {
-    setIsNewAppointmentOpen(false);
-  };
-
-  const handleAppointmentSubmit = async (data: any) => {
-    setIsLoading(true);
-    
-    try {
-      // Create Google Calendar event if needed
-      let googleCalendarEventId: string | undefined = undefined;
-      
-      if (data.useGoogleCalendar) {
-        try {
-          googleCalendarEventId = await createGoogleCalendarEvent({
-            title: data.type === "visita" ? "Visita a Propiedad" : 
-                   data.type === "reunion" ? "Reunión en Oficina" : 
-                   data.type === "llamada" ? "Llamada Telefónica" : "Reunión Virtual",
-            location: data.location,
-            description: data.notes || "",
-            date: data.date,
-            time: data.time,
-            type: data.type
-          });
-        } catch (error) {
-          console.error("Error creating Google Calendar event:", error);
-          toast({
-            variant: "destructive",
-            title: "Error de sincronización",
-            description: "No se pudo crear el evento en Google Calendar."
-          });
-        }
-      }
-
-      // Generate appointment type title
-      const typeTitle = data.type === "visita" ? "Visita a Propiedad" : 
-                        data.type === "reunion" ? "Reunión en Oficina" : 
-                        data.type === "llamada" ? "Llamada Telefónica" : "Reunión Virtual";
-      
-      // Create the new appointment
-      const newAppointment = {
-        id: appointments.length + 1,
-        title: `${typeTitle}${data.client ? ` con ${data.client}` : ""}`,
-        date: data.date,
-        time: data.time,
-        location: data.location,
-        client: data.client || "Sin asignar",
-        clientId: data.clientId || "",
-        type: data.type,
-        status: "scheduled",
-        notes: data.notes,
-        googleCalendarEventId
-      };
-      
-      // Update state with the new appointment
-      setAppointments([...appointments, newAppointment]);
-      
-      // Show success message
-      const calendarMessage = googleCalendarEventId 
-        ? " y se ha sincronizado con Google Calendar"
-        : "";
-        
-      toast({
-        title: "Cita programada",
-        description: `Se ha programado una cita para el ${format(data.date, 'dd/MM/yyyy', { locale: es })} a las ${data.time}${calendarMessage}.`
-      });
-      
-    } finally {
-      setIsLoading(false);
-      setIsNewAppointmentOpen(false);
-    }
-  };
-  
   const selectedDateAppointments = appointments.filter(
     appointment => 
       date && 
@@ -159,9 +78,6 @@ const CalendarPage = () => {
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h1 className="text-2xl font-bold">Calendario</h1>
-        <Button onClick={handleOpenNewAppointment}>
-          <Plus className="mr-2 h-4 w-4" /> Nueva Cita
-        </Button>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -286,15 +202,6 @@ const CalendarPage = () => {
           </CardContent>
         </Card>
       </div>
-      
-      {/* New Appointment Dialog */}
-      <NewAppointmentDialog
-        isOpen={isNewAppointmentOpen}
-        onOpenChange={setIsNewAppointmentOpen}
-        onSubmit={handleAppointmentSubmit}
-        onCancel={handleCancelNewAppointment}
-        isLoading={isLoading || isGoogleCalendarSyncing}
-      />
     </div>
   );
 };
