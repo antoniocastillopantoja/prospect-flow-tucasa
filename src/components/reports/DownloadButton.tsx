@@ -128,6 +128,7 @@ export const DownloadButton = ({
         reportLabel={getReportLabel(selectedReportType)}
         timeframe={timeframe}
         isSourceReport={selectedReportType === "fuente"}
+        isStatusReport={selectedReportType === "estado"}
         onDownload={handleDownloadReport}
         isDownloading={isDownloading}
       />
