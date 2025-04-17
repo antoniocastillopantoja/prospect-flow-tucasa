@@ -11,17 +11,17 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { getReportData, reportTypes } from "./reportData";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { mockProspects } from "@/models/Prospect";
 import * as XLSX from 'xlsx';
+import { getReportData } from "./reportData";
+import { DownloadDialog } from "./DownloadDialog";
+import { 
+  generateExcelWorkbook, 
+  getReportFilename, 
+} from "./utils/excelReportUtils";
+import { 
+  getReportLabel,
+  getTimeframeDescription
+} from "./utils/reportLabels";
 
 interface DownloadButtonProps {
   reportType: string;
@@ -41,137 +41,28 @@ export const DownloadButton = ({
   const [showDownloadDialog, setShowDownloadDialog] = useState(false);
   const { toast } = useToast();
 
-  const convertToCSV = (data: any[]) => {
-    if (!data || !data.length) return '';
-    
-    const headers = Object.keys(data[0]);
-    const csvRows = [];
-    
-    csvRows.push(headers.join(','));
-    
-    for (const row of data) {
-      const values = headers.map(header => {
-        const value = row[header];
-        return typeof value === 'string' && value.includes(',') 
-          ? `"${value}"` 
-          : value;
-      });
-      csvRows.push(values.join(','));
-    }
-    
-    return csvRows.join('\n');
-  };
-
-  const getReportDataByType = () => {
-    switch (selectedReportType) {
-      case "fuente":
-        return reportTypes.prospectsBySource;
-      case "estado":
-        return reportTypes.prospectsByStatus;
-      case "sector":
-        return reportTypes.prospectsBySector;
-      case "agente":
-        return reportTypes.prospectsByAgent;
-      case "rendimiento":
-        return reportTypes.prospectsByAgent;
-      default:
-        return getData();
-    }
-  };
-
-  const getReportLabel = () => {
-    switch (selectedReportType) {
-      case "fuente":
-        return "prospectos por fuente";
-      case "estado":
-        return "prospectos por estado";
-      case "sector":
-        return "prospectos por sector";
-      case "agente":
-        return "prospectos por agente";
-      case "rendimiento":
-        return "rendimiento de agentes";
-      default:
-        return `reporte de ${reportType}`;
-    }
-  };
-
   const handleReportTypeSelect = (type: string) => {
     setSelectedReportType(type);
     onReportTypeChange(type);
     setShowDownloadDialog(true);
   };
 
-  const getProspectsBySource = () => {
-    const prospectsBySource: Record<string, any[]> = {};
-    
-    mockProspects.forEach(prospect => {
-      const source = prospect.source || "Desconocido";
-      if (!prospectsBySource[source]) {
-        prospectsBySource[source] = [];
-      }
-      prospectsBySource[source].push({
-        ID: prospect.id,
-        Nombre: prospect.name,
-        Teléfono: prospect.phone,
-        Email: prospect.email || "",
-        Ubicación: prospect.location,
-        Sector: prospect.sector,
-        "Rango de Precio": prospect.priceRange,
-        "Tipo de Crédito": prospect.creditType,
-        "Fecha de Contacto": prospect.contactDate,
-        Agente: prospect.agent,
-        Estado: prospect.status,
-        Notas: prospect.notes || ""
-      });
-    });
-    
-    return prospectsBySource;
-  };
-
   const handleDownloadReport = () => {
     setIsDownloading(true);
 
     try {
-      const reportLabel = getReportLabel();
-      const filename = `reporte-${reportLabel}-${timeframe}.xlsx`;
+      const reportLabel = getReportLabel(selectedReportType);
+      const filename = getReportFilename(reportLabel, timeframe);
       
-      // Create a new workbook
-      const wb = XLSX.utils.book_new();
-      
-      // Add the summary data as the first sheet
-      const summaryData = getReportDataByType();
-      const summaryWs = XLSX.utils.json_to_sheet(summaryData);
-      XLSX.utils.book_append_sheet(wb, summaryWs, "Resumen");
-      
-      // If this is a source report, add detailed prospect data by source
-      if (selectedReportType === "fuente") {
-        const prospectsBySource = getProspectsBySource();
-        
-        // Create a sheet with all prospects
-        const allProspectsData = Object.values(prospectsBySource).flat();
-        const allProspectsWs = XLSX.utils.json_to_sheet(allProspectsData);
-        XLSX.utils.book_append_sheet(wb, allProspectsWs, "Todos los Prospectos");
-        
-        // Create individual sheets for each source
-        Object.entries(prospectsBySource).forEach(([source, prospects]) => {
-          if (prospects.length > 0) {
-            const sourceWs = XLSX.utils.json_to_sheet(prospects);
-            // Limit sheet name to 31 characters (Excel limitation)
-            const sheetName = source.substring(0, 28) + (source.length > 28 ? "..." : "");
-            XLSX.utils.book_append_sheet(wb, sourceWs, sheetName);
-          }
-        });
-      }
+      // Generate Excel workbook
+      const wb = generateExcelWorkbook(selectedReportType, timeframe);
       
       // Write the workbook and trigger download
       XLSX.writeFile(wb, filename);
 
       toast({
         title: "Reporte descargado",
-        description: `Se ha descargado el reporte de ${reportLabel} para el ${timeframe === 'mes' ? 'último mes' : 
-          timeframe === 'semana' ? 'última semana' : 
-          timeframe === 'trimestre' ? 'último trimestre' : 'último año'}`,
+        description: `Se ha descargado el reporte de ${reportLabel} para el ${getTimeframeDescription(timeframe)}`,
         variant: "default",
       });
       
@@ -231,49 +122,15 @@ export const DownloadButton = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog open={showDownloadDialog} onOpenChange={setShowDownloadDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Descargar Reporte</DialogTitle>
-            <DialogDescription>
-              ¿Desea descargar el reporte de {getReportLabel()} para el {
-                timeframe === 'mes' ? 'último mes' : 
-                timeframe === 'semana' ? 'última semana' : 
-                timeframe === 'trimestre' ? 'último trimestre' : 'último año'
-              }?
-              {selectedReportType === "fuente" && (
-                <p className="mt-2">
-                  Este reporte incluirá hojas adicionales con los datos completos de cada prospecto organizados por fuente.
-                </p>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowDownloadDialog(false)}
-            >
-              Cancelar
-            </Button>
-            <Button 
-              onClick={handleDownloadReport}
-              disabled={isDownloading}
-            >
-              {isDownloading ? (
-                <>
-                  <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></span>
-                  Descargando...
-                </>
-              ) : (
-                <>
-                  <FileDown className="h-4 w-4 mr-2" /> 
-                  Descargar
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DownloadDialog 
+        open={showDownloadDialog}
+        onOpenChange={setShowDownloadDialog}
+        reportLabel={getReportLabel(selectedReportType)}
+        timeframe={timeframe}
+        isSourceReport={selectedReportType === "fuente"}
+        onDownload={handleDownloadReport}
+        isDownloading={isDownloading}
+      />
     </>
   );
 };
