@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { User, Phone, Mail, Home, MapPin, CreditCard, Calendar } from "lucide-react";
+import { User, Phone, Mail, Home, MapPin, CreditCard, Calendar, Building, Percent } from "lucide-react";
 import { Prospect } from "@/models/Prospect";
 import ProspectStatusBadge from "@/components/ProspectStatusBadge";
 
@@ -56,6 +56,18 @@ const ProspectInfoTab: React.FC<ProspectInfoTabProps> = ({ prospect }) => {
                   <CreditCard className="h-4 w-4 mr-2 text-gray-500" />
                   <span>Crédito: {prospect.creditType}</span>
                 </div>
+                {prospect.status === "closed" && prospect.propertyId && (
+                  <div className="flex items-center">
+                    <Building className="h-4 w-4 mr-2 text-gray-500" />
+                    <span>Propiedad ID: {prospect.propertyId}</span>
+                  </div>
+                )}
+                {prospect.status === "closed" && prospect.commissionPercentage && (
+                  <div className="flex items-center">
+                    <Percent className="h-4 w-4 mr-2 text-gray-500" />
+                    <span>Comisión: {prospect.commissionPercentage}%</span>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -81,6 +93,23 @@ const ProspectInfoTab: React.FC<ProspectInfoTabProps> = ({ prospect }) => {
             </div>
           </div>
         </div>
+
+        {/* Display closing information in a highlighted section when the prospect is closed */}
+        {prospect.status === "closed" && prospect.propertyId && prospect.commissionPercentage && (
+          <div className="mt-6 bg-green-50 p-4 rounded-md border border-green-200">
+            <h3 className="font-medium text-green-800 mb-2">Información de Cierre</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center">
+                <Building className="h-4 w-4 mr-2 text-green-600" />
+                <span className="text-green-700">Propiedad vendida: {prospect.propertyId}</span>
+              </div>
+              <div className="flex items-center">
+                <Percent className="h-4 w-4 mr-2 text-green-600" />
+                <span className="text-green-700">Porcentaje de comisión: {prospect.commissionPercentage}%</span>
+              </div>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

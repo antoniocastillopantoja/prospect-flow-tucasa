@@ -75,7 +75,9 @@ export const mockProspects: Prospect[] = [
     contactDate: "2025-04-06",
     agent: "Pedro Ramírez",
     source: "TikTok",
-    status: "closed"
+    status: "closed",
+    propertyId: "PROP-2025-042",
+    commissionPercentage: "3.5"
   },
   {
     id: 5,
