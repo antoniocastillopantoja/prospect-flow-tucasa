@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   BarChart,
@@ -22,7 +21,8 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download } from "lucide-react";
+import { Download, FileDown } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -34,8 +34,9 @@ import {
 const ReportsPage = () => {
   const [timeframe, setTimeframe] = useState("mes");
   const [reportType, setReportType] = useState("prospectos");
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { toast } = useToast();
   
-  // Datos de ejemplo para gráficos
   const prospectsBySource = [
     { name: "Facebook", value: 45 },
     { name: "Instagram", value: 28 },
@@ -64,12 +65,103 @@ const ReportsPage = () => {
     { name: "Pedro Ramírez", nuevos: 15, contactados: 12, citas: 8, cerrados: 4 }
   ];
 
+  const handleDownloadReport = () => {
+    setIsDownloading(true);
+
+    try {
+      let dataToExport;
+      let filename;
+
+      switch (reportType) {
+        case 'prospectos':
+          dataToExport = prospectsBySource;
+          filename = `reporte-prospectos-${timeframe}.csv`;
+          break;
+        case 'conversion':
+          dataToExport = prospectsByStatus;
+          filename = `reporte-conversion-${timeframe}.csv`;
+          break;
+        case 'agentes':
+          dataToExport = prospectsByAgent;
+          filename = `reporte-agentes-${timeframe}.csv`;
+          break;
+        default:
+          dataToExport = prospectsBySource;
+          filename = `reporte-general-${timeframe}.csv`;
+      }
+
+      const csvData = convertToCSV(dataToExport);
+
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Reporte descargado",
+        description: `Se ha descargado el reporte de ${reportType} para el ${timeframe === 'mes' ? 'último mes' : 
+          timeframe === 'semana' ? 'última semana' : 
+          timeframe === 'trimestre' ? 'último trimestre' : 'último año'}`,
+        variant: "default",
+      });
+    } catch (error) {
+      console.error("Error downloading report:", error);
+      toast({
+        title: "Error al descargar",
+        description: "No se pudo descargar el reporte. Intente de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const convertToCSV = (data) => {
+    if (!data || !data.length) return '';
+    
+    const headers = Object.keys(data[0]);
+    const csvRows = [];
+    
+    csvRows.push(headers.join(','));
+    
+    for (const row of data) {
+      const values = headers.map(header => {
+        const value = row[header];
+        return typeof value === 'string' && value.includes(',') 
+          ? `"${value}"` 
+          : value;
+      });
+      csvRows.push(values.join(','));
+    }
+    
+    return csvRows.join('\n');
+  };
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h1 className="text-2xl font-bold">Reportes</h1>
-        <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" /> Descargar Reporte
+        <Button 
+          variant="outline" 
+          disabled={isDownloading}
+          onClick={handleDownloadReport}
+          className="gap-2"
+        >
+          {isDownloading ? (
+            <>
+              <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+              Descargando...
+            </>
+          ) : (
+            <>
+              <FileDown className="h-4 w-4" /> 
+              Descargar Reporte
+            </>
+          )}
         </Button>
       </div>
       
