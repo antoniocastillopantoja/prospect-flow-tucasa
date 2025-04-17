@@ -21,6 +21,14 @@ interface NotificationPreferences {
   emailFrequency: string;
 }
 
+// Define available email frequency options
+const EMAIL_FREQUENCY_OPTIONS = [
+  { value: "diario", label: "Diario" },
+  { value: "semanal", label: "Semanal" },
+  { value: "mensual", label: "Mensual" },
+  { value: "nunca", label: "Nunca" }
+];
+
 export const NotificationsTab = () => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -79,6 +87,16 @@ export const NotificationsTab = () => {
 
   const handleEmailFrequencyChange = (value: string) => {
     setPreferences({ ...preferences, emailFrequency: value });
+    
+    // Get the display label for the selected frequency
+    const selectedOption = EMAIL_FREQUENCY_OPTIONS.find(option => option.value === value);
+    const frequencyLabel = selectedOption ? selectedOption.label : value;
+    
+    // Visual feedback for the user
+    toast({
+      title: "Frecuencia de emails actualizada",
+      description: `Los resúmenes por correo serán enviados con frecuencia ${frequencyLabel.toLowerCase()}.`,
+    });
   };
   
   const handleSaveSettings = () => {
@@ -160,7 +178,7 @@ export const NotificationsTab = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="bg-primary/10 p-2 rounded-full">
-                <Mail className={`h-5 w-5 text-primary`} />
+                <Mail className={`h-5 w-5 ${preferences.emailFrequency !== 'nunca' ? 'text-primary' : 'text-muted-foreground'}`} />
               </div>
               <div className="space-y-0.5">
                 <Label htmlFor="email-frequency">Frecuencia de emails</Label>
@@ -177,10 +195,11 @@ export const NotificationsTab = () => {
                 <SelectValue placeholder="Frecuencia" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="diario">Diario</SelectItem>
-                <SelectItem value="semanal">Semanal</SelectItem>
-                <SelectItem value="mensual">Mensual</SelectItem>
-                <SelectItem value="nunca">Nunca</SelectItem>
+                {EMAIL_FREQUENCY_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
