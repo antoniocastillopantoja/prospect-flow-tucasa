@@ -29,6 +29,35 @@ export const reportData = {
   ]
 };
 
+export const reportTypes = {
+  prospectsBySource: [
+    { name: "Facebook", value: 45 },
+    { name: "Instagram", value: 28 },
+    { name: "TikTok", value: 15 },
+    { name: "Sitio Web", value: 32 },
+    { name: "Referidos", value: 20 }
+  ],
+  prospectsByStatus: [
+    { name: "Nuevos", value: 35 },
+    { name: "Contactados", value: 45 },
+    { name: "Cita Agendada", value: 25 },
+    { name: "Cita Cancelada", value: 15 },
+    { name: "Cerrados", value: 18 }
+  ],
+  prospectsBySector: [
+    { sector: "Norte", total: 40, porcentaje: "25%" },
+    { sector: "Sur", total: 62, porcentaje: "38%" },
+    { sector: "Centro", total: 48, porcentaje: "30%" },
+    { sector: "Este", total: 12, porcentaje: "7%" }
+  ],
+  prospectsByAgent: [
+    { agente: "Juan Pérez", total: 60, conversion: "22%" },
+    { agente: "Ana Rodríguez", total: 72, conversion: "31%" },
+    { agente: "Pedro Ramírez", total: 39, conversion: "18%" },
+    { agente: "María López", total: 41, conversion: "20%" }
+  ]
+};
+
 export const getReportData = (reportType: string) => {
   switch (reportType) {
     case 'prospectos':
