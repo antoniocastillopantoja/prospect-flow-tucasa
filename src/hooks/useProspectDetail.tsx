@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +20,6 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
   const [commissionLoading, setCommissionLoading] = useState(false);
   const [pendingStatusChange, setPendingStatusChange] = useState<ProspectStatus | null>(null);
 
-  // Hooks
   const { notes, handleAddNote, setNotes } = useProspectNotes(initialNotes);
   const { 
     appointments, 
@@ -35,7 +33,6 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     cancelAppointment
   } = useAppointments(initialAppointments);
 
-  // Initialize the edit hook after prospect is defined
   const prospectEditHook = useProspectEdit(prospect, updateProspect);
   
   const handleStatusChange = (newStatus: ProspectStatus) => {
@@ -47,7 +44,6 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
         updateProspectStatus(parseInt(id), newStatus);
         setProspect({ ...prospect, status: newStatus });
         
-        // If setting to appointment status, check for existing appointments
         if (newStatus === "appointment" && appointments.length === 0) {
           handleScheduleAppointment();
         }
@@ -59,15 +55,14 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     if (prospect && id && pendingStatusChange === "closed") {
       setCommissionLoading(true);
       
-      // Update prospect with property ID and commission percentage
       const updatedProspect = {
         ...prospect,
         propertyId: data.propertyId,
         commissionPercentage: data.commissionPercentage,
+        negotiatedPrice: data.negotiatedPrice,
         status: pendingStatusChange
       };
       
-      // Simulate API call delay
       setTimeout(() => {
         updateProspect(parseInt(id), updatedProspect);
         setProspect(updatedProspect);
@@ -77,7 +72,7 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
         
         toast({
           title: "Cliente cerrado exitosamente",
-          description: `Propiedad ${data.propertyId} con ${data.commissionPercentage}% de comisión`
+          description: `Propiedad ${data.propertyId} con ${data.commissionPercentage}% de comisión y precio de $${data.negotiatedPrice}`
         });
       }, 500);
     }
@@ -88,29 +83,27 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     setPendingStatusChange(null);
   };
 
-  // Function to update closing info directly from the info tab
-  const handleUpdateClosingInfo = (propertyId: string, commissionPercentage: string) => {
+  const handleUpdateClosingInfo = (propertyId: string, commissionPercentage: string, negotiatedPrice: string) => {
     if (prospect && prospect.status === "closed" && id) {
       const updatedProspect = {
         ...prospect,
         propertyId,
-        commissionPercentage
+        commissionPercentage,
+        negotiatedPrice
       };
       
-      // Simulate API call delay
       setTimeout(() => {
         updateProspect(parseInt(id), updatedProspect);
         setProspect(updatedProspect);
         
         toast({
           title: "Información de cierre actualizada",
-          description: `Propiedad ${propertyId} con ${commissionPercentage}% de comisión`
+          description: `Propiedad ${propertyId} con ${commissionPercentage}% de comisión y precio de $${negotiatedPrice}`
         });
       }, 300);
     }
   };
 
-  // Ensure this function returns the promise from handleAppointmentSubmit
   const onAppointmentSubmit = async (data: any) => {
     return await handleAppointmentSubmit(data);
   };
@@ -122,11 +115,9 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     }
   };
   
-  // Handle appointment status changes
   const handleCompleteAppointment = (appointmentId: number) => {
     completeAppointment(appointmentId);
     
-    // If this is the only appointment and it's completed, also update prospect status
     if (appointments.length === 1 && prospect && prospect.status === "appointment") {
       updateProspectStatus(parseInt(id!), "closed");
       setProspect({ ...prospect, status: "closed" });
@@ -136,20 +127,18 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
   const handleCancelAppointment = (appointmentId: number) => {
     cancelAppointment(appointmentId);
     
-    // If this is the only appointment and it's canceled, also update prospect status
     if (appointments.length === 1 && prospect && prospect.status === "appointment") {
       updateProspectStatus(parseInt(id!), "canceled");
       setProspect({ ...prospect, status: "canceled" });
     }
   };
 
-  // Load prospect data
   useEffect(() => {
     if (prospects.length > 0 && id) {
       const foundProspect = prospects.find(p => p.id === parseInt(id));
       if (foundProspect) {
         setProspect(foundProspect);
-        prospectEditHook.resetForm(); // Reset the form with new prospect data
+        prospectEditHook.resetForm();
       } else {
         toast({
           variant: "destructive",
@@ -162,7 +151,6 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     }
   }, [prospects, id, navigate, toast]);
 
-  // Add a method to handle dialog open change
   const handleCommissionDialogOpenChange = (open: boolean) => {
     if (!open && pendingStatusChange === "closed") {
       setPendingStatusChange(null);

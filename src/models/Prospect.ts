@@ -1,4 +1,3 @@
-
 export type ProspectStatus = "new" | "contacted" | "appointment" | "canceled" | "closed";
 
 export interface Prospect {
@@ -17,6 +16,7 @@ export interface Prospect {
   notes?: string;
   propertyId?: string;
   commissionPercentage?: string;
+  negotiatedPrice?: string;
 }
 
 // Mock data for prospects
@@ -77,7 +77,8 @@ export const mockProspects: Prospect[] = [
     source: "TikTok",
     status: "closed",
     propertyId: "PROP-2025-042",
-    commissionPercentage: "3.5"
+    commissionPercentage: "3.5",
+    negotiatedPrice: "2750000"
   },
   {
     id: 5,

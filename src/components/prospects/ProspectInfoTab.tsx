@@ -13,7 +13,7 @@ import ClosingInformation from "./info-sections/ClosingInformation";
 
 interface ProspectInfoTabProps {
   prospect: Prospect;
-  onUpdateClosingInfo?: (propertyId: string, commissionPercentage: string) => void;
+  onUpdateClosingInfo?: (propertyId: string, commissionPercentage: string, negotiatedPrice: string) => void;
 }
 
 const ProspectInfoTab: React.FC<ProspectInfoTabProps> = ({ prospect, onUpdateClosingInfo }) => {
@@ -53,6 +53,7 @@ const ProspectInfoTab: React.FC<ProspectInfoTabProps> = ({ prospect, onUpdateClo
           <ClosingInformation
             propertyId={prospect.propertyId || ""}
             commissionPercentage={prospect.commissionPercentage || ""}
+            negotiatedPrice={prospect.negotiatedPrice || ""}
             onUpdate={onUpdateClosingInfo}
           />
         )}

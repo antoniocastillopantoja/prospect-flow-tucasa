@@ -1,32 +1,36 @@
 
 import React, { useState } from "react";
-import { Building, Percent, CheckCircle, X } from "lucide-react";
+import { Building, Percent, CheckCircle, X, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 interface ClosingInformationProps {
   propertyId: string;
   commissionPercentage: string;
-  onUpdate: (propertyId: string, commissionPercentage: string) => void;
+  negotiatedPrice?: string;
+  onUpdate: (propertyId: string, commissionPercentage: string, negotiatedPrice: string) => void;
 }
 
 const ClosingInformation: React.FC<ClosingInformationProps> = ({
   propertyId,
   commissionPercentage,
+  negotiatedPrice = "",
   onUpdate
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [propertyIdValue, setPropertyIdValue] = useState(propertyId || "");
   const [commissionValue, setCommissionValue] = useState(commissionPercentage || "");
+  const [priceValue, setPriceValue] = useState(negotiatedPrice || "");
 
   const handleStartEdit = () => {
     setPropertyIdValue(propertyId || "");
     setCommissionValue(commissionPercentage || "");
+    setPriceValue(negotiatedPrice || "");
     setIsEditing(true);
   };
 
   const handleSave = () => {
-    onUpdate(propertyIdValue, commissionValue);
+    onUpdate(propertyIdValue, commissionValue, priceValue);
     setIsEditing(false);
   };
 
@@ -69,7 +73,7 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
         )}
       </div>
       {!isEditing && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center">
             <Building className="h-4 w-4 mr-2 text-green-600" />
             <span className="text-green-700">ID de Propiedad vendida: {propertyId}</span>
@@ -78,10 +82,14 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
             <Percent className="h-4 w-4 mr-2 text-green-600" />
             <span className="text-green-700">Porcentaje de comisión: {commissionPercentage}%</span>
           </div>
+          <div className="flex items-center">
+            <DollarSign className="h-4 w-4 mr-2 text-green-600" />
+            <span className="text-green-700">Precio Negociado: {negotiatedPrice ? `$${negotiatedPrice}` : 'No especificado'}</span>
+          </div>
         </div>
       )}
       {isEditing && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center gap-2">
             <Building className="h-4 w-4 text-green-600" />
             <Input 
@@ -102,6 +110,16 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
               max="100"
             />
           </div>
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4 text-green-600" />
+            <Input 
+              value={priceValue}
+              onChange={(e) => setPriceValue(e.target.value)}
+              placeholder="Precio Negociado"
+              type="number"
+              min="0"
+            />
+          </div>
         </div>
       )}
     </div>
@@ -109,4 +127,3 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
 };
 
 export default ClosingInformation;
-
