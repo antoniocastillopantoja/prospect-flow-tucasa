@@ -34,7 +34,7 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
   } = useAppointments(initialAppointments);
 
   const prospectEditHook = useProspectEdit(prospect, updateProspect);
-  
+
   const handleStatusChange = (newStatus: ProspectStatus) => {
     if (prospect && id) {
       if (newStatus === "closed") {
@@ -59,7 +59,7 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
         ...prospect,
         propertyId: data.propertyId,
         commissionPercentage: data.commissionPercentage,
-        negotiatedPrice: data.negotiatedPrice,
+        negotiatedPrice: data.negotiatedPrice || "",
         status: pendingStatusChange
       };
       
@@ -72,7 +72,7 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
         
         toast({
           title: "Cliente cerrado exitosamente",
-          description: `Propiedad ${data.propertyId} con ${data.commissionPercentage}% de comisión y precio de $${data.negotiatedPrice}`
+          description: `Propiedad ${data.propertyId} con ${data.commissionPercentage}% de comisión y precio de $${data.negotiatedPrice || "No especificado"}`
         });
       }, 500);
     }
@@ -98,7 +98,7 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
         
         toast({
           title: "Información de cierre actualizada",
-          description: `Propiedad ${propertyId} con ${commissionPercentage}% de comisión y precio de $${negotiatedPrice}`
+          description: `Propiedad ${propertyId} con ${commissionPercentage}% de comisión y precio de $${negotiatedPrice || "No especificado"}`
         });
       }, 300);
     }

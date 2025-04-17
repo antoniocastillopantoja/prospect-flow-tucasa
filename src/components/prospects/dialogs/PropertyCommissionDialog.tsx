@@ -3,7 +3,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Building, Percent } from "lucide-react";
+import { Building, Percent, DollarSign } from "lucide-react";
 
 import { 
   Dialog,
@@ -33,7 +33,8 @@ const formSchema = z.object({
     })
     .refine(value => parseFloat(value) > 0 && parseFloat(value) <= 100, {
       message: "El porcentaje debe estar entre 0 y 100"
-    })
+    }),
+  negotiatedPrice: z.string().optional()
 });
 
 export type PropertyCommissionFormData = z.infer<typeof formSchema>;
@@ -57,7 +58,8 @@ const PropertyCommissionDialog: React.FC<PropertyCommissionDialogProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       propertyId: "",
-      commissionPercentage: "3"
+      commissionPercentage: "3",
+      negotiatedPrice: ""
     }
   });
 
@@ -109,6 +111,29 @@ const PropertyCommissionDialog: React.FC<PropertyCommissionDialogProps> = ({
                         step="0.01"
                         min="0.01" 
                         max="100"
+                        {...field} 
+                        className="w-full pl-8" 
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="negotiatedPrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Precio Negociado</FormLabel>
+                  <FormControl>
+                    <div className="relative flex items-center">
+                      <DollarSign className="absolute left-2 h-4 w-4 text-gray-500" />
+                      <Input 
+                        placeholder="1000000" 
+                        type="number"
+                        min="0"
                         {...field} 
                         className="w-full pl-8" 
                       />
