@@ -1,5 +1,6 @@
 
 import { reportTypes } from "../reportData";
+import { getCommissionsSummaryByAgent } from './dataOrganizers';
 
 // Get report data based on report type
 export const getReportDataByType = (reportType: string) => {
@@ -12,6 +13,8 @@ export const getReportDataByType = (reportType: string) => {
       return reportTypes.prospectsBySector;
     case "agente":
       return reportTypes.prospectsByAgent;
+    case "comisiones":
+      return getCommissionsSummaryByAgent();
     default:
       return [];
   }

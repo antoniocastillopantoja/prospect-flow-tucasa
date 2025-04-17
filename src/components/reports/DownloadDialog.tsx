@@ -20,6 +20,7 @@ interface DownloadDialogProps {
   isStatusReport: boolean;
   isSectorReport: boolean;
   isAgentReport: boolean;
+  isCommissionReport?: boolean;
   onDownload: () => void;
   isDownloading: boolean;
 }
@@ -33,6 +34,7 @@ export const DownloadDialog = ({
   isStatusReport,
   isSectorReport,
   isAgentReport,
+  isCommissionReport = false,
   onDownload,
   isDownloading
 }: DownloadDialogProps) => {
@@ -64,6 +66,12 @@ export const DownloadDialog = ({
                 {reportLabel.includes('rendimiento') && (
                   <span> También incluirá hojas con los datos completos de cada prospecto organizados por estado.</span>
                 )}
+              </p>
+            )}
+            {isCommissionReport && (
+              <p className="mt-2">
+                Este reporte incluirá el resumen de comisiones por agente y una hoja detallada con las ventas cerradas, 
+                incluyendo información de prospectos, comisión, precio negociado y propiedad.
               </p>
             )}
           </DialogDescription>

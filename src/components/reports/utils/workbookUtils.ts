@@ -5,7 +5,10 @@ import {
   getProspectsBySource,
   getProspectsByStatus,
   getProspectsBySector,
-  getProspectsByAgent
+  getProspectsByAgent,
+  getCommissionsByAgent,
+  getCommissionsSummaryByAgent,
+  getAllClosedProspects
 } from './dataOrganizers';
 
 /**
@@ -47,13 +50,48 @@ const getDataOrganizerByReportType = (reportType: string): (() => Record<string,
       return getProspectsBySector;
     case "agente":
       return getProspectsByAgent;
+    case "comisiones":
+      return getCommissionsByAgent;
     default:
       return () => ({});
   }
 };
 
+// Create commission report workbook
+const createCommissionsWorkbook = () => {
+  const wb = XLSX.utils.book_new();
+  
+  // Añadir hoja de resumen de comisiones por agente
+  const summaryData = getCommissionsSummaryByAgent();
+  const summaryWs = XLSX.utils.json_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(wb, summaryWs, "Resumen Comisiones");
+  
+  // Añadir hoja con todas las ventas cerradas
+  const closedProspectsData = getAllClosedProspects();
+  const closedProspectsWs = XLSX.utils.json_to_sheet(closedProspectsData);
+  XLSX.utils.book_append_sheet(wb, closedProspectsWs, "Ventas Cerradas");
+  
+  // Añadir hojas por agente
+  const commissionsByAgent = getCommissionsByAgent();
+  Object.entries(commissionsByAgent).forEach(([agent, commissions]) => {
+    if (commissions.length > 0) {
+      const agentWs = XLSX.utils.json_to_sheet(commissions);
+      // Limit sheet name to 31 characters (Excel limitation)
+      const sheetName = agent.substring(0, 28) + (agent.length > 28 ? "..." : "");
+      XLSX.utils.book_append_sheet(wb, agentWs, sheetName);
+    }
+  });
+  
+  return wb;
+};
+
 // Generate Excel workbook based on report type and timeframe
 export const generateExcelWorkbook = (reportType: string, timeframe: string) => {
+  // Para el reporte de comisiones, usar una lógica especializada
+  if (reportType === "comisiones") {
+    return createCommissionsWorkbook();
+  }
+  
   // Create a new workbook
   const wb = XLSX.utils.book_new();
   
