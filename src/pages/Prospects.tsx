@@ -16,6 +16,7 @@ const Prospects = () => {
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sectorFilter, setSectorFilter] = useState("");
+  const [agentFilter, setAgentFilter] = useState("all");
 
   // Sync the local search with the global search context
   useEffect(() => {
@@ -35,10 +36,11 @@ const Prospects = () => {
       prospect.location.toLowerCase().includes(localSearchQuery.toLowerCase()) ||
       prospect.phone.includes(localSearchQuery);
       
-    const matchesStatus = statusFilter === "" || prospect.status === statusFilter;
-    const matchesSector = sectorFilter === "" || prospect.sector === sectorFilter;
+    const matchesStatus = statusFilter === "" || statusFilter === "all" || prospect.status === statusFilter;
+    const matchesSector = sectorFilter === "" || sectorFilter === "all" || prospect.sector === sectorFilter;
+    const matchesAgent = agentFilter === "all" || prospect.agent === agentFilter;
     
-    return matchesSearch && matchesStatus && matchesSector;
+    return matchesSearch && matchesStatus && matchesSector && matchesAgent;
   });
 
   return (
@@ -61,6 +63,8 @@ const Prospects = () => {
               setStatusFilter={setStatusFilter}
               sectorFilter={sectorFilter}
               setSectorFilter={setSectorFilter}
+              agentFilter={agentFilter}
+              setAgentFilter={setAgentFilter}
             />
           </div>
         </CardContent>

@@ -8,20 +8,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { sectors } from "@/models/Prospect";
+import { sectors, agents } from "@/models/Prospect";
 
 interface ProspectFiltersProps {
   statusFilter: string;
   setStatusFilter: (status: string) => void;
   sectorFilter: string;
   setSectorFilter: (sector: string) => void;
+  agentFilter: string;
+  setAgentFilter: (agent: string) => void;
 }
 
 const ProspectFilters: React.FC<ProspectFiltersProps> = ({
   statusFilter,
   setStatusFilter,
   sectorFilter,
-  setSectorFilter
+  setSectorFilter,
+  agentFilter,
+  setAgentFilter
 }) => {
   return (
     <div className="flex gap-2 flex-wrap md:flex-nowrap">
@@ -52,6 +56,18 @@ const ProspectFilters: React.FC<ProspectFiltersProps> = ({
           <SelectItem value="all">Todos</SelectItem>
           {sectors.map(sector => (
             <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select value={agentFilter} onValueChange={setAgentFilter}>
+        <SelectTrigger className="w-36">
+          <SelectValue placeholder="Agente" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">Todos</SelectItem>
+          {agents.map(agent => (
+            <SelectItem key={agent} value={agent}>{agent}</SelectItem>
           ))}
         </SelectContent>
       </Select>
