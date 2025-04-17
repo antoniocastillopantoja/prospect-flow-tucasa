@@ -38,7 +38,7 @@ const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
               position: "relative"
             }
           }}
-          modifierClassNames={{
+          modifiersClassNames={{
             hasAppointment: "relative has-appointment"
           }}
           components={{
