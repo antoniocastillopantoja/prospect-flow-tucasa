@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -87,6 +88,28 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     setPendingStatusChange(null);
   };
 
+  // Function to update closing info directly from the info tab
+  const handleUpdateClosingInfo = (propertyId: string, commissionPercentage: string) => {
+    if (prospect && prospect.status === "closed" && id) {
+      const updatedProspect = {
+        ...prospect,
+        propertyId,
+        commissionPercentage
+      };
+      
+      // Simulate API call delay
+      setTimeout(() => {
+        updateProspect(parseInt(id), updatedProspect);
+        setProspect(updatedProspect);
+        
+        toast({
+          title: "Información de cierre actualizada",
+          description: `Propiedad ${propertyId} con ${commissionPercentage}% de comisión`
+        });
+      }, 300);
+    }
+  };
+
   // Ensure this function returns the promise from handleAppointmentSubmit
   const onAppointmentSubmit = async (data: any) => {
     return await handleAppointmentSubmit(data);
@@ -167,6 +190,7 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     handleCancelAppointment,
     handleCommissionSubmit,
     handleCommissionCancel,
-    handleCommissionDialogOpenChange
+    handleCommissionDialogOpenChange,
+    handleUpdateClosingInfo
   };
 }

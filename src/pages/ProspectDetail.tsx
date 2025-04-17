@@ -68,7 +68,8 @@ const ProspectDetail = () => {
     handleCancelAppointment,
     handleCommissionSubmit,
     handleCommissionCancel,
-    handleCommissionDialogOpenChange
+    handleCommissionDialogOpenChange,
+    handleUpdateClosingInfo
   } = useProspectDetail(initialNotes, initialAppointments);
 
   // Handle appointment submission and tab switching
@@ -95,6 +96,7 @@ const ProspectDetail = () => {
         onAddNote={handleAddNote}
         onCompleteAppointment={handleCompleteAppointment}
         onCancelAppointment={handleCancelAppointment}
+        onUpdateClosingInfo={handleUpdateClosingInfo}
       />
       
       <ProspectDetailDialogs
