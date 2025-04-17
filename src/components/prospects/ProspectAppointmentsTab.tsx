@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Calendar, Clock, MapPin, ClipboardEdit, CheckCircle, XCircle } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface Appointment {
   id: number;
@@ -16,18 +17,44 @@ interface Appointment {
 interface ProspectAppointmentsTabProps {
   appointments: Appointment[];
   onScheduleAppointment: () => void;
+  onCompleteAppointment?: (id: number) => void;
+  onCancelAppointment?: (id: number) => void;
 }
 
 const ProspectAppointmentsTab: React.FC<ProspectAppointmentsTabProps> = ({ 
   appointments, 
-  onScheduleAppointment 
+  onScheduleAppointment,
+  onCompleteAppointment,
+  onCancelAppointment
 }) => {
+  const [appointmentToCancel, setAppointmentToCancel] = useState<number | null>(null);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+
   const getAppointmentStatusClass = (status: string) => {
     switch (status) {
       case "scheduled": return "bg-purple-100 text-purple-800";
       case "completed": return "bg-green-100 text-green-800";
       case "canceled": return "bg-red-100 text-red-800";
       default: return "";
+    }
+  };
+
+  const handleCancelClick = (id: number) => {
+    setAppointmentToCancel(id);
+    setCancelDialogOpen(true);
+  };
+
+  const handleConfirmCancel = () => {
+    if (appointmentToCancel !== null && onCancelAppointment) {
+      onCancelAppointment(appointmentToCancel);
+      setAppointmentToCancel(null);
+    }
+    setCancelDialogOpen(false);
+  };
+
+  const handleCompleteAppointment = (id: number) => {
+    if (onCompleteAppointment) {
+      onCompleteAppointment(id);
     }
   };
 
@@ -79,12 +106,27 @@ const ProspectAppointmentsTab: React.FC<ProspectAppointmentsTabProps> = ({
                   <Button size="sm" variant="outline">
                     <ClipboardEdit className="h-4 w-4 mr-1" /> Editar
                   </Button>
-                  <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50">
-                    <CheckCircle className="h-4 w-4 mr-1" /> Completada
-                  </Button>
-                  <Button size="sm" variant="outline" className="text-red-600 border-red-600 hover:bg-red-50">
-                    <XCircle className="h-4 w-4 mr-1" /> Cancelar
-                  </Button>
+                  
+                  {appointment.status === "scheduled" && (
+                    <>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-green-600 border-green-600 hover:bg-green-50"
+                        onClick={() => handleCompleteAppointment(appointment.id)}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-1" /> Completada
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-red-600 border-red-600 hover:bg-red-50"
+                        onClick={() => handleCancelClick(appointment.id)}
+                      >
+                        <XCircle className="h-4 w-4 mr-1" /> Cancelar
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
@@ -95,6 +137,24 @@ const ProspectAppointmentsTab: React.FC<ProspectAppointmentsTabProps> = ({
           </div>
         )}
       </CardContent>
+
+      {/* Cancel Appointment Confirmation Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción cancelará la cita y no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Volver</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmCancel} className="bg-red-600 hover:bg-red-700">
+              Confirmar cancelación
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };

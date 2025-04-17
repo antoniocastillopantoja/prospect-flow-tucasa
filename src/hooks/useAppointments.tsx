@@ -90,6 +90,38 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
     }
   };
 
+  // New functions to handle appointment status updates
+  const completeAppointment = (id: number) => {
+    setAppointments(currentAppointments => 
+      currentAppointments.map(appointment => 
+        appointment.id === id 
+          ? { ...appointment, status: "completed" } 
+          : appointment
+      )
+    );
+    
+    toast({
+      title: "Cita completada",
+      description: "La cita ha sido marcada como completada."
+    });
+  };
+
+  const cancelAppointment = (id: number) => {
+    setAppointments(currentAppointments => 
+      currentAppointments.map(appointment => 
+        appointment.id === id 
+          ? { ...appointment, status: "canceled" } 
+          : appointment
+      )
+    );
+    
+    toast({
+      variant: "default",
+      title: "Cita cancelada",
+      description: "La cita ha sido cancelada."
+    });
+  };
+
   return {
     appointments,
     isSchedulingAppointment,
@@ -97,6 +129,8 @@ export function useAppointments(initialAppointments: Appointment[] = []) {
     handleScheduleAppointment,
     handleCancelAppointmentScheduling,
     handleAppointmentSubmit,
-    setAppointments
+    setAppointments,
+    completeAppointment,
+    cancelAppointment
   };
 }

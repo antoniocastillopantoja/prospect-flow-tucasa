@@ -61,7 +61,9 @@ const ProspectDetail = () => {
     handleScheduleAppointment,
     handleCancelAppointmentScheduling,
     handleDeleteProspect,
-    handleAddNote
+    handleAddNote,
+    handleCompleteAppointment,
+    handleCancelAppointment
   } = useProspectDetail(initialNotes, initialAppointments);
 
   // Handle appointment submission and tab switching
@@ -87,6 +89,8 @@ const ProspectDetail = () => {
         onScheduleAppointment={handleScheduleAppointment}
         onEdit={prospectEditHook.handleEdit}
         onAddNote={handleAddNote}
+        onCompleteAppointment={handleCompleteAppointment}
+        onCancelAppointment={handleCancelAppointment}
       />
       
       <ProspectDetailDialogs

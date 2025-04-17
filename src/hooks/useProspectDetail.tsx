@@ -26,7 +26,9 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     handleScheduleAppointment, 
     handleCancelAppointmentScheduling, 
     handleAppointmentSubmit,
-    setAppointments
+    setAppointments,
+    completeAppointment,
+    cancelAppointment
   } = useAppointments(initialAppointments);
 
   // Initialize the edit hook after prospect is defined
@@ -36,6 +38,11 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     if (prospect && id) {
       updateProspectStatus(parseInt(id), newStatus);
       setProspect({ ...prospect, status: newStatus });
+      
+      // If setting to appointment status, check for existing appointments
+      if (newStatus === "appointment" && appointments.length === 0) {
+        handleScheduleAppointment();
+      }
     }
   };
 
@@ -48,6 +55,27 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     if (prospect && id) {
       deleteProspect(parseInt(id));
       navigate('/prospectos');
+    }
+  };
+  
+  // Handle appointment status changes
+  const handleCompleteAppointment = (appointmentId: number) => {
+    completeAppointment(appointmentId);
+    
+    // If this is the only appointment and it's completed, also update prospect status
+    if (appointments.length === 1 && prospect && prospect.status === "appointment") {
+      updateProspectStatus(parseInt(id!), "closed");
+      setProspect({ ...prospect, status: "closed" });
+    }
+  };
+  
+  const handleCancelAppointment = (appointmentId: number) => {
+    cancelAppointment(appointmentId);
+    
+    // If this is the only appointment and it's canceled, also update prospect status
+    if (appointments.length === 1 && prospect && prospect.status === "appointment") {
+      updateProspectStatus(parseInt(id!), "canceled");
+      setProspect({ ...prospect, status: "canceled" });
     }
   };
 
@@ -83,6 +111,8 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     handleScheduleAppointment,
     handleCancelAppointmentScheduling,
     handleDeleteProspect,
-    handleAddNote
+    handleAddNote,
+    handleCompleteAppointment,
+    handleCancelAppointment
   };
 }

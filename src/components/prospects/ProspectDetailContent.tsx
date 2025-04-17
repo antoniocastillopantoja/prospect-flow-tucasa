@@ -17,6 +17,8 @@ interface ProspectDetailContentProps {
   onScheduleAppointment: () => void;
   onEdit: () => void;
   onAddNote: (note: string) => void;
+  onCompleteAppointment?: (id: number) => void;
+  onCancelAppointment?: (id: number) => void;
 }
 
 const ProspectDetailContent: React.FC<ProspectDetailContentProps> = ({
@@ -26,7 +28,9 @@ const ProspectDetailContent: React.FC<ProspectDetailContentProps> = ({
   onStatusChange,
   onScheduleAppointment,
   onEdit,
-  onAddNote
+  onAddNote,
+  onCompleteAppointment,
+  onCancelAppointment
 }) => {
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || "info";
@@ -65,6 +69,8 @@ const ProspectDetailContent: React.FC<ProspectDetailContentProps> = ({
               <ProspectAppointmentsTab 
                 appointments={appointments}
                 onScheduleAppointment={onScheduleAppointment}
+                onCompleteAppointment={onCompleteAppointment}
+                onCancelAppointment={onCancelAppointment}
               />
             </TabsContent>
           </Tabs>
