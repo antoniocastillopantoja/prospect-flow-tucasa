@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Building, Percent, CheckCircle, X, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface ClosingInformationProps {
   propertyId: string;
@@ -36,6 +37,17 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
 
   const handleCancel = () => {
     setIsEditing(false);
+  };
+
+  // Formatear precio con separadores de miles
+  const formatPrice = (price: string) => {
+    if (!price) return "No especificado";
+    return new Intl.NumberFormat('es-MX', { 
+      style: 'currency', 
+      currency: 'MXN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(parseFloat(price));
   };
 
   return (
@@ -84,7 +96,12 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
           </div>
           <div className="flex items-center">
             <DollarSign className="h-4 w-4 mr-2 text-green-600" />
-            <span className="text-green-700">Precio Negociado: {negotiatedPrice ? `$${negotiatedPrice}` : 'No especificado'}</span>
+            <span className={cn(
+              "text-green-700", 
+              !negotiatedPrice && "text-gray-500 italic"
+            )}>
+              Precio Negociado: {formatPrice(negotiatedPrice)}
+            </span>
           </div>
         </div>
       )}
@@ -127,3 +144,4 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
 };
 
 export default ClosingInformation;
+
