@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { User, Phone, Mail, Home, MapPin, CreditCard, Calendar, Building, Percent, CheckCircle, X } from "lucide-react";
@@ -82,45 +81,6 @@ const ProspectInfoTab: React.FC<ProspectInfoTabProps> = ({ prospect, onUpdateClo
                   <CreditCard className="h-4 w-4 mr-2 text-gray-500" />
                   <span>Crédito: {prospect.creditType}</span>
                 </div>
-                {isClosedProspect && !isEditing && (
-                  <>
-                    <div className="flex items-center">
-                      <Building className="h-4 w-4 mr-2 text-gray-500" />
-                      <span>Propiedad ID: {prospect.propertyId}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Percent className="h-4 w-4 mr-2 text-gray-500" />
-                      <span>Comisión: {prospect.commissionPercentage}%</span>
-                    </div>
-                  </>
-                )}
-
-                {isClosedProspect && isEditing && (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <Building className="h-4 w-4 text-gray-500" />
-                      <Input 
-                        value={propertyId}
-                        onChange={(e) => setPropertyId(e.target.value)}
-                        placeholder="ID de Propiedad"
-                        className="h-8 py-1"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Percent className="h-4 w-4 text-gray-500" />
-                      <Input 
-                        value={commissionPercentage}
-                        onChange={(e) => setCommissionPercentage(e.target.value)}
-                        placeholder="% Comisión"
-                        type="number"
-                        step="0.1"
-                        min="0"
-                        max="100"
-                        className="h-8 py-1"
-                      />
-                    </div>
-                  </>
-                )}
               </div>
             </div>
             
@@ -147,7 +107,6 @@ const ProspectInfoTab: React.FC<ProspectInfoTabProps> = ({ prospect, onUpdateClo
           </div>
         </div>
 
-        {/* Display closing information in a highlighted section when the prospect is closed */}
         {isClosedProspect && (
           <div className="mt-6 bg-green-50 p-4 rounded-md border border-green-200">
             <div className="flex justify-between items-center mb-2">
