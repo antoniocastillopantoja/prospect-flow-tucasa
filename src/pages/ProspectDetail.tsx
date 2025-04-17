@@ -68,7 +68,7 @@ const ProspectDetail = () => {
     handleCancelAppointment,
     handleCommissionSubmit,
     handleCommissionCancel,
-    handleCommissionDialogOpenChange // Add this line to destructure the function
+    handleCommissionDialogOpenChange
   } = useProspectDetail(initialNotes, initialAppointments);
 
   // Handle appointment submission and tab switching
@@ -108,8 +108,9 @@ const ProspectDetail = () => {
         prospectEditHook={prospectEditHook}
         onDeleteProspect={handleDeleteProspect}
         prospectId={prospect.id}
+        prospectStatus={prospect.status}
         isCommissionDialogOpen={isCommissionDialogOpen}
-        onCommissionDialogOpenChange={handleCommissionDialogOpenChange} // Use the destructured function
+        onCommissionDialogOpenChange={handleCommissionDialogOpenChange}
         onCommissionSubmit={handleCommissionSubmit}
         onCommissionCancel={handleCommissionCancel}
         commissionLoading={commissionLoading}

@@ -3,6 +3,7 @@ import React from "react";
 import AppointmentDialog from "@/components/prospects/dialogs/AppointmentDialog";
 import EditProspectDialog from "@/components/prospects/dialogs/EditProspectDialog";
 import PropertyCommissionDialog, { PropertyCommissionFormData } from "@/components/prospects/dialogs/PropertyCommissionDialog";
+import { ProspectStatus } from "@/models/Prospect";
 
 interface ProspectDetailDialogsProps {
   isSchedulingAppointment: boolean;
@@ -13,6 +14,7 @@ interface ProspectDetailDialogsProps {
   prospectEditHook: any;
   onDeleteProspect: () => void;
   prospectId: number;
+  prospectStatus: ProspectStatus;
   isCommissionDialogOpen?: boolean;
   onCommissionDialogOpenChange?: (open: boolean) => void;
   onCommissionSubmit?: (data: PropertyCommissionFormData) => void;
@@ -29,6 +31,7 @@ const ProspectDetailDialogs: React.FC<ProspectDetailDialogsProps> = ({
   prospectEditHook,
   onDeleteProspect,
   prospectId,
+  prospectStatus,
   isCommissionDialogOpen = false,
   onCommissionDialogOpenChange = () => {},
   onCommissionSubmit = () => {},
@@ -46,6 +49,7 @@ const ProspectDetailDialogs: React.FC<ProspectDetailDialogsProps> = ({
         isLoading={prospectEditHook.editLoading}
         onDelete={onDeleteProspect}
         prospectId={prospectId}
+        prospectStatus={prospectStatus}
       />
       
       <AppointmentDialog 

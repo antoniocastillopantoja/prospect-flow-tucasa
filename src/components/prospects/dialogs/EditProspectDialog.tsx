@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { ProspectStatus } from "@/models/Prospect";
 
 interface EditProspectDialogProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ interface EditProspectDialogProps {
   isLoading: boolean;
   onDelete?: () => void;
   prospectId?: number;
+  prospectStatus?: ProspectStatus;
 }
 
 const EditProspectDialog: React.FC<EditProspectDialogProps> = ({
@@ -36,7 +38,8 @@ const EditProspectDialog: React.FC<EditProspectDialogProps> = ({
   onCancel,
   isLoading,
   onDelete,
-  prospectId
+  prospectId,
+  prospectStatus = "new"
 }) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -51,6 +54,9 @@ const EditProspectDialog: React.FC<EditProspectDialogProps> = ({
     setIsDeleteDialogOpen(false);
   };
 
+  // Only show delete button if the prospect status is "new"
+  const canDelete = prospectStatus === "new";
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -58,19 +64,21 @@ const EditProspectDialog: React.FC<EditProspectDialogProps> = ({
           <DialogHeader>
             <DialogTitle>Editar Prospecto</DialogTitle>
             <DialogDescription>
-              Modifica la información del prospecto o haz clic en el botón de borrar para eliminarlo.
+              Modifica la información del prospecto{canDelete ? " o haz clic en el botón de borrar para eliminarlo" : ""}.
             </DialogDescription>
           </DialogHeader>
-          <div className="flex justify-end mb-4">
-            <Button 
-              variant="destructive" 
-              onClick={handleDeleteClick}
-              className="flex items-center gap-2"
-            >
-              <Trash2 size={16} />
-              Borrar Prospecto
-            </Button>
-          </div>
+          {canDelete && (
+            <div className="flex justify-end mb-4">
+              <Button 
+                variant="destructive" 
+                onClick={handleDeleteClick}
+                className="flex items-center gap-2"
+              >
+                <Trash2 size={16} />
+                Borrar Prospecto
+              </Button>
+            </div>
+          )}
           <ProspectForm 
             form={form}
             onSubmit={onSubmit}
