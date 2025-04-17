@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -14,8 +13,7 @@ import {
   LineChart,
   Line,
   FunnelChart,
-  Funnel,
-  FunnelItem
+  Funnel
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { reportData } from "./reportData";
@@ -194,7 +192,6 @@ export const ReportCharts = ({ activeTab, reportType = "prospectos" }: ReportCha
                   <XAxis dataKey="etapa" />
                   <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
                   <Tooltip formatter={(value) => [`${value}%`, 'Conversión']} />
-                  <Legend />
                   <Line 
                     type="monotone" 
                     dataKey={(entry) => parseInt(entry.porcentaje)} 
