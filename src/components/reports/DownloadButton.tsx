@@ -114,9 +114,6 @@ export const DownloadButton = ({
           <DropdownMenuItem onClick={() => handleReportTypeSelect("agente")}>
             Prospectos por agente
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleReportTypeSelect("rendimiento")}>
-            Rendimiento de agentes
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

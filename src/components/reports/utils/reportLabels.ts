@@ -10,8 +10,6 @@ export const getReportLabel = (reportType: string) => {
       return "prospectos por sector";
     case "agente":
       return "prospectos por agente";
-    case "rendimiento":
-      return "rendimiento de agentes";
     default:
       return `reporte de ${reportType}`;
   }

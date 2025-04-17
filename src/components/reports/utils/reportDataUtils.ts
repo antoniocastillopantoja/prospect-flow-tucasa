@@ -12,8 +12,6 @@ export const getReportDataByType = (reportType: string) => {
       return reportTypes.prospectsBySector;
     case "agente":
       return reportTypes.prospectsByAgent;
-    case "rendimiento":
-      return reportTypes.prospectsByAgent;
     default:
       return [];
   }
