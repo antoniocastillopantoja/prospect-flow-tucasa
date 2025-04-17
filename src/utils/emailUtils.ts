@@ -8,12 +8,14 @@
  * @param email User email to send the invitation
  * @param fullName Full name of the user
  * @param role Role assigned to the user
+ * @param temporaryPassword Optional temporary password to include in the email
  * @returns Promise that resolves when email is sent
  */
 export const sendInvitationEmail = async (
   email: string, 
   fullName: string, 
-  role: string
+  role: string,
+  temporaryPassword?: string
 ): Promise<boolean> => {
   try {
     // In a real implementation, this would connect to an email API
@@ -22,6 +24,9 @@ export const sendInvitationEmail = async (
     
     // Log for debugging
     console.log(`Invitation email sent to ${email} for ${fullName} with role ${role}`);
+    if (temporaryPassword) {
+      console.log(`Temporary password included: ${temporaryPassword}`);
+    }
     
     // Return true to indicate success
     return true;

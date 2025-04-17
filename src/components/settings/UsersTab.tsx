@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Card, 
   CardContent, 
@@ -39,7 +39,14 @@ export const UsersTab = () => {
     }
   ]);
 
-  const handleAddUser = (data: UserFormValues) => {
+  // Initialize temporary passwords from localStorage
+  useEffect(() => {
+    if (!localStorage.getItem("tempPasswords")) {
+      localStorage.setItem("tempPasswords", JSON.stringify({}));
+    }
+  }, []);
+
+  const handleAddUser = (data: UserFormValues & { temporaryPassword?: string }) => {
     // Create a new user with the form data
     const newUser: User = {
       id: (users.length + 1).toString(),
@@ -51,18 +58,41 @@ export const UsersTab = () => {
     
     // Add the new user to the users array
     setUsers([...users, newUser]);
+    
+    // Save the temporary password in localStorage if provided
+    if (data.temporaryPassword) {
+      const tempPasswords = JSON.parse(localStorage.getItem("tempPasswords") || "{}");
+      tempPasswords[data.email] = data.temporaryPassword;
+      localStorage.setItem("tempPasswords", JSON.stringify(tempPasswords));
+    }
   };
 
   const handleEditUser = (userId: string, userData: UserEditValues) => {
     // Update the user in the users array
     setUsers(users.map(user => {
       if (user.id === userId) {
-        return {
+        // Get old email before updating
+        const oldEmail = user.email;
+        
+        // Update user
+        const updatedUser = {
           ...user,
           name: userData.name,
           email: userData.email,
           role: capitalizeFirstLetter(userData.role)
         };
+        
+        // If email changed, update the temp password entry
+        if (oldEmail !== userData.email) {
+          const tempPasswords = JSON.parse(localStorage.getItem("tempPasswords") || "{}");
+          if (tempPasswords[oldEmail]) {
+            tempPasswords[userData.email] = tempPasswords[oldEmail];
+            delete tempPasswords[oldEmail];
+            localStorage.setItem("tempPasswords", JSON.stringify(tempPasswords));
+          }
+        }
+        
+        return updatedUser;
       }
       return user;
     }));

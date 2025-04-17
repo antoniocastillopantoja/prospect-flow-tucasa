@@ -26,10 +26,10 @@ const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
     
     try {
       await login(email, password);
-      toast({
-        title: "Inicio de sesión exitoso",
-        description: "Bienvenido al sistema CRM de Tu Casa Ideal"
-      });
+      
+      // El toast de éxito se mostrará en el componente que gestione el cambio de contraseña
+      // si detectó una contraseña temporal
+      
     } catch (error) {
       toast({
         title: "Error de autenticación",

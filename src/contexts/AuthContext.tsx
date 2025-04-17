@@ -1,6 +1,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { isTemporaryPassword } from "@/utils/passwordUtils";
+import ChangePasswordDialog from "@/components/auth/ChangePasswordDialog";
 
 type User = {
   id: string;
@@ -30,6 +32,9 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isTemporaryPasswordDetected, setIsTemporaryPasswordDetected] = useState<boolean>(false);
+  const [tempLoginEmail, setTempLoginEmail] = useState<string>("");
+  const [tempLoginPassword, setTempLoginPassword] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +50,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     
     try {
+      // Verificar si es una contraseña temporal
+      if (isTemporaryPassword(password)) {
+        // Guardar email y password temporalmente para cuando se cambie la contraseña
+        setTempLoginEmail(email);
+        setTempLoginPassword(password);
+        setIsTemporaryPasswordDetected(true);
+        setIsLoading(false);
+        return;
+      }
+      
       // Simulación de autenticación - Esto sería reemplazado por una API real
       if (email === "demo@tucasaideal.com" && password === "password") {
         const userData: User = {
@@ -68,6 +83,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const handlePasswordChange = async (newPassword: string) => {
+    // En una implementación real, esto sería una llamada a la API para cambiar la contraseña
+    try {
+      setIsLoading(true);
+      
+      // Eliminar la contraseña temporal del storage
+      const tempPasswords = JSON.parse(localStorage.getItem("tempPasswords") || "{}");
+      if (tempPasswords[tempLoginEmail]) {
+        delete tempPasswords[tempLoginEmail];
+        localStorage.setItem("tempPasswords", JSON.stringify(tempPasswords));
+      }
+      
+      // Simular login exitoso con la nueva contraseña
+      if (tempLoginEmail === "demo@tucasaideal.com") {
+        const userData: User = {
+          id: "1",
+          name: "Juan Pérez",
+          email: "demo@tucasaideal.com",
+          role: "Gerente",
+        };
+        
+        // Guardar usuario en localStorage
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+        navigate("/");
+      }
+      
+      // Reiniciar el estado de contraseña temporal
+      setIsTemporaryPasswordDetected(false);
+      setTempLoginEmail("");
+      setTempLoginPassword("");
+    } catch (error) {
+      console.error("Error changing password:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("user");
     setUser(null);
@@ -85,6 +139,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }}
     >
       {children}
+      <ChangePasswordDialog 
+        open={isTemporaryPasswordDetected}
+        onOpenChange={setIsTemporaryPasswordDetected}
+        onPasswordChange={handlePasswordChange}
+        email={tempLoginEmail}
+      />
     </AuthContext.Provider>
   );
 };

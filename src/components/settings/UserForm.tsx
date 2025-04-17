@@ -17,6 +17,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { sendInvitationEmail } from "@/utils/emailUtils";
+import { generateTemporaryPassword } from "@/utils/passwordUtils";
 
 // Define schema for user form validation
 export const userFormSchema = z.object({
@@ -28,12 +29,13 @@ export const userFormSchema = z.object({
 export type UserFormValues = z.infer<typeof userFormSchema>;
 
 interface UserFormProps {
-  onAddUser: (data: UserFormValues) => void;
+  onAddUser: (data: UserFormValues & { temporaryPassword: string }) => void;
 }
 
 export const UserForm = ({ onAddUser }: UserFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [temporaryPassword, setTemporaryPassword] = useState("");
   
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
@@ -48,25 +50,36 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
     setIsSubmitting(true);
     
     try {
-      // Send invitation email
+      // Generate a temporary password
+      const tempPassword = generateTemporaryPassword();
+      setTemporaryPassword(tempPassword);
+      
+      // Send invitation email with temporary password
       const emailSent = await sendInvitationEmail(
         data.email,
         data.fullName,
-        data.role
+        data.role,
+        tempPassword
       );
       
       if (emailSent) {
-        // Add the user to the system
-        onAddUser(data);
+        // Add the user to the system with temporary password flag
+        onAddUser({
+          ...data,
+          temporaryPassword: tempPassword
+        });
         
         // Show success toast
         toast({
           title: "Usuario añadido",
-          description: "Se ha enviado un correo de invitación al nuevo usuario."
+          description: "Se ha enviado un correo de invitación al nuevo usuario con su contraseña temporal."
         });
         
-        // Reset form
-        form.reset();
+        // Reset form after displaying the password
+        setTimeout(() => {
+          form.reset();
+          setTemporaryPassword("");
+        }, 10000); // Clear after 10 seconds
       } else {
         // Show error toast
         toast({
@@ -147,6 +160,21 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
             </FormItem>
           )}
         />
+        
+        {temporaryPassword && (
+          <div className="p-4 border rounded-md bg-yellow-50 border-yellow-200 space-y-2">
+            <div className="font-medium text-yellow-800">Contraseña temporal generada</div>
+            <div className="flex items-center justify-between">
+              <code className="bg-white px-2 py-1 rounded border">{temporaryPassword}</code>
+              <div className="text-xs text-yellow-700">
+                Esta contraseña solo se mostrará una vez
+              </div>
+            </div>
+            <p className="text-sm text-yellow-700">
+              Se le solicitará al usuario que cambie esta contraseña en su primer inicio de sesión.
+            </p>
+          </div>
+        )}
         
         <Button type="submit" disabled={isSubmitting}>
           <UserPlus className="mr-2 h-4 w-4" /> 
