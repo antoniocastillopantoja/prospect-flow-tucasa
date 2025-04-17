@@ -59,11 +59,11 @@ const ReportsPage = () => {
         </TabsList>
         
         <TabsContent value="graficos">
-          <ReportCharts activeTab={activeTab} />
+          <ReportCharts activeTab={activeTab} reportType={reportType} />
         </TabsContent>
         
         <TabsContent value="tablas">
-          <ReportTables activeTab={activeTab} />
+          <ReportTables activeTab={activeTab} reportType={reportType} />
         </TabsContent>
       </Tabs>
     </div>
