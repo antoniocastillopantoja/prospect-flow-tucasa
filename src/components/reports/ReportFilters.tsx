@@ -41,6 +41,7 @@ export const ReportFilters = ({
           <SelectItem value="semana">Última Semana</SelectItem>
           <SelectItem value="mes">Último Mes</SelectItem>
           <SelectItem value="trimestre">Último Trimestre</SelectItem>
+          <SelectItem value="semestre">Último Semestre</SelectItem>
           <SelectItem value="anio">Último Año</SelectItem>
         </SelectContent>
       </Select>

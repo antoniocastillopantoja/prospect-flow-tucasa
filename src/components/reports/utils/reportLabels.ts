@@ -24,6 +24,8 @@ export const getTimeframeDescription = (timeframe: string) => {
       return 'última semana';
     case 'trimestre':
       return 'último trimestre';
+    case 'semestre':
+      return 'último semestre';
     case 'año':
     default:
       return 'último año';
