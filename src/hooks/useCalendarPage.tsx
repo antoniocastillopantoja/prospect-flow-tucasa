@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { useNavigation } from "@/hooks/useNavigation";
@@ -81,7 +80,6 @@ export function useCalendarPage() {
     }
   };
 
-  // Nuevas funciones para manejar el cambio de estado de las citas
   const completeAppointment = (appointmentId: number) => {
     setAppointments(prevAppointments =>
       prevAppointments.map(appointment => 

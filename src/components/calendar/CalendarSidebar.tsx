@@ -1,6 +1,7 @@
 
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { CalendarCheck } from "lucide-react";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Appointment } from "@/hooks/useCalendarPage";
@@ -30,7 +31,31 @@ const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
             hasAppointment: (date) => getDateWithAppointments(date)
           }}
           modifiersStyles={{
-            hasAppointment: { backgroundColor: "#e2e8f0", fontWeight: "bold" }
+            hasAppointment: { 
+              backgroundColor: "#e2f1fe", 
+              fontWeight: "bold",
+              color: "#1e40af",
+              position: "relative"
+            }
+          }}
+          modifierClassNames={{
+            hasAppointment: "relative has-appointment"
+          }}
+          components={{
+            DayContent: (props) => {
+              const hasAppointment = getDateWithAppointments(props.date);
+              return (
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {props.date.getDate()}
+                  {hasAppointment && (
+                    <CalendarCheck 
+                      className="absolute bottom-0 right-0 h-3 w-3 text-blue-600" 
+                      aria-label="Día con citas"
+                    />
+                  )}
+                </div>
+              );
+            }
           }}
           locale={es}
         />
@@ -38,7 +63,9 @@ const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
         <div className="mt-4 space-y-1">
           <p className="text-sm text-gray-500">Leyenda:</p>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-[#e2e8f0] rounded-sm mr-2"></div>
+            <div className="w-4 h-4 bg-[#e2f1fe] rounded-sm mr-2 relative">
+              <CalendarCheck className="absolute -bottom-1 -right-1 h-3 w-3 text-blue-600" />
+            </div>
             <span className="text-sm">Día con citas</span>
           </div>
         </div>
@@ -65,7 +92,12 @@ const CalendarSidebar: React.FC<CalendarSidebarProps> = ({
                   className="flex justify-between items-center text-sm p-2 hover:bg-gray-50 rounded-md cursor-pointer"
                   onClick={() => onDateSelect(new Date(dayDate))}
                 >
-                  <span>{dayStr}</span>
+                  <span className="flex items-center gap-1">
+                    {dayStr}
+                    {dayAppointments.length > 0 && (
+                      <CalendarCheck className="h-4 w-4 text-blue-600" />
+                    )}
+                  </span>
                   <span className={`px-2 py-1 ${dayAppointments.length > 0 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'} rounded-full text-xs`}>
                     {dayAppointments.length} {dayAppointments.length === 1 ? 'cita' : 'citas'}
                   </span>
