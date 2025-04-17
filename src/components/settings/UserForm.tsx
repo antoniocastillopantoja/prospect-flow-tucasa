@@ -15,6 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { sendInvitationEmail } from "@/utils/emailUtils";
 
 // Define schema for user form validation
 export const userFormSchema = z.object({
@@ -30,6 +32,9 @@ interface UserFormProps {
 }
 
 export const UserForm = ({ onAddUser }: UserFormProps) => {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
@@ -39,9 +44,48 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
     }
   });
 
-  const handleSubmit = (data: UserFormValues) => {
-    onAddUser(data);
-    form.reset();
+  const handleSubmit = async (data: UserFormValues) => {
+    setIsSubmitting(true);
+    
+    try {
+      // Send invitation email
+      const emailSent = await sendInvitationEmail(
+        data.email,
+        data.fullName,
+        data.role
+      );
+      
+      if (emailSent) {
+        // Add the user to the system
+        onAddUser(data);
+        
+        // Show success toast
+        toast({
+          title: "Usuario añadido",
+          description: "Se ha enviado un correo de invitación al nuevo usuario."
+        });
+        
+        // Reset form
+        form.reset();
+      } else {
+        // Show error toast
+        toast({
+          title: "Error",
+          description: "No se pudo enviar el correo de invitación. Intente nuevamente.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      // Show error toast
+      toast({
+        title: "Error",
+        description: "Ocurrió un error al procesar la solicitud.",
+        variant: "destructive"
+      });
+      console.error("Error adding user:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -104,9 +148,9 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
           )}
         />
         
-        <Button type="submit">
+        <Button type="submit" disabled={isSubmitting}>
           <UserPlus className="mr-2 h-4 w-4" /> 
-          Añadir Usuario
+          {isSubmitting ? "Enviando invitación..." : "Añadir Usuario"}
         </Button>
       </form>
     </Form>
