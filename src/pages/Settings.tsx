@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,29 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UserPlus } from "lucide-react";
+
+// Define schema for user form validation
+const userFormSchema = z.object({
+  fullName: z.string().min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
+  email: z.string().email({ message: "Correo electrónico inválido" }),
+  role: z.string({ required_error: "Por favor selecciona un rol" })
+});
+
+type UserFormValues = z.infer<typeof userFormSchema>;
+
+// Interface for user data
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+}
 
 const SettingsPage = () => {
   const { toast } = useToast();
@@ -28,7 +52,39 @@ const SettingsPage = () => {
   const [notifyNewProspects, setNotifyNewProspects] = useState(true);
   const [notifyAppointments, setNotifyAppointments] = useState(true);
   const [googleCalendarSync, setGoogleCalendarSync] = useState(false);
+  const [users, setUsers] = useState<User[]>([
+    {
+      id: "1",
+      name: "Juan Pérez",
+      email: "juan@tucasaideal.com",
+      role: "Gerente",
+      status: "Activo"
+    },
+    {
+      id: "2",
+      name: "Ana Rodríguez",
+      email: "ana@tucasaideal.com",
+      role: "Prospectador",
+      status: "Activo"
+    },
+    {
+      id: "3",
+      name: "Pedro Ramírez",
+      email: "pedro@tucasaideal.com",
+      role: "Cerrador",
+      status: "Activo"
+    }
+  ]);
   
+  const form = useForm<UserFormValues>({
+    resolver: zodResolver(userFormSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      role: ""
+    }
+  });
+
   const handleSaveSettings = () => {
     toast({
       title: "Configuración guardada",
@@ -36,10 +92,54 @@ const SettingsPage = () => {
     });
   };
   
-  const handleAddUser = () => {
+  const handleAddUser = (data: UserFormValues) => {
+    // Create a new user with the form data
+    const newUser: User = {
+      id: (users.length + 1).toString(),
+      name: data.fullName,
+      email: data.email,
+      role: data.role,
+      status: "Activo"
+    };
+    
+    // Add the new user to the users array
+    setUsers([...users, newUser]);
+    
+    // Show success toast
     toast({
       title: "Usuario añadido",
       description: "Se ha enviado un correo de invitación al nuevo usuario."
+    });
+    
+    // Reset the form
+    form.reset();
+  };
+
+  const handleEditUser = (userId: string) => {
+    // This would open an edit dialog or form in a real implementation
+    toast({
+      title: "Editar usuario",
+      description: `Editando el usuario con ID ${userId}`
+    });
+  };
+
+  const handleToggleUserStatus = (userId: string) => {
+    // Toggle the status of the user
+    setUsers(users.map(user => {
+      if (user.id === userId) {
+        const newStatus = user.status === "Activo" ? "Inactivo" : "Activo";
+        return { ...user, status: newStatus };
+      }
+      return user;
+    }));
+
+    // Show status change toast
+    const user = users.find(u => u.id === userId);
+    const newStatus = user?.status === "Activo" ? "desactivado" : "activado";
+    
+    toast({
+      title: "Estado actualizado",
+      description: `El usuario ha sido ${newStatus} correctamente.`
     });
   };
 
@@ -64,35 +164,71 @@ const SettingsPage = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="username">Nombre completo</Label>
-                      <Input id="username" placeholder="Juan Pérez" />
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleAddUser)} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="fullName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label htmlFor="fullName">Nombre completo</Label>
+                            <FormControl>
+                              <Input id="fullName" placeholder="Juan Pérez" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label htmlFor="email">Correo electrónico</Label>
+                            <FormControl>
+                              <Input id="email" type="email" placeholder="juan@tucasaideal.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
-                    <div>
-                      <Label htmlFor="email">Correo electrónico</Label>
-                      <Input id="email" type="email" placeholder="juan@tucasaideal.com" />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="role">Rol</Label>
-                    <Select>
-                      <SelectTrigger id="role">
-                        <SelectValue placeholder="Selecciona un rol" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="prospectador">Prospectador</SelectItem>
-                        <SelectItem value="cerrador">Cerrador</SelectItem>
-                        <SelectItem value="gerente">Gerente</SelectItem>
-                        <SelectItem value="admin">Administrador</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <Button onClick={handleAddUser}>Añadir Usuario</Button>
-                </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="role"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label htmlFor="role">Rol</Label>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger id="role">
+                                <SelectValue placeholder="Selecciona un rol" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="prospectador">Prospectador</SelectItem>
+                              <SelectItem value="cerrador">Cerrador</SelectItem>
+                              <SelectItem value="gerente">Gerente</SelectItem>
+                              <SelectItem value="admin">Administrador</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button type="submit">
+                      <UserPlus className="mr-2 h-4 w-4" /> 
+                      Añadir Usuario
+                    </Button>
+                  </form>
+                </Form>
               </CardContent>
             </Card>
             
@@ -116,60 +252,44 @@ const SettingsPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr className="border-b">
-                        <td className="p-2">Juan Pérez</td>
-                        <td className="p-2">juan@tucasaideal.com</td>
-                        <td className="p-2">Gerente</td>
-                        <td className="p-2">
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Activo
-                          </span>
-                        </td>
-                        <td className="p-2">
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">Editar</Button>
-                            <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50">
-                              Desactivar
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr className="border-b">
-                        <td className="p-2">Ana Rodríguez</td>
-                        <td className="p-2">ana@tucasaideal.com</td>
-                        <td className="p-2">Prospectador</td>
-                        <td className="p-2">
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Activo
-                          </span>
-                        </td>
-                        <td className="p-2">
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">Editar</Button>
-                            <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50">
-                              Desactivar
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="p-2">Pedro Ramírez</td>
-                        <td className="p-2">pedro@tucasaideal.com</td>
-                        <td className="p-2">Cerrador</td>
-                        <td className="p-2">
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Activo
-                          </span>
-                        </td>
-                        <td className="p-2">
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">Editar</Button>
-                            <Button variant="outline" size="sm" className="text-red-600 border-red-600 hover:bg-red-50">
-                              Desactivar
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
+                      {users.map(user => (
+                        <tr key={user.id} className="border-b">
+                          <td className="p-2">{user.name}</td>
+                          <td className="p-2">{user.email}</td>
+                          <td className="p-2">{user.role}</td>
+                          <td className="p-2">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              user.status === "Activo" 
+                                ? "bg-green-100 text-green-800" 
+                                : "bg-red-100 text-red-800"
+                            }`}>
+                              {user.status}
+                            </span>
+                          </td>
+                          <td className="p-2">
+                            <div className="flex space-x-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleEditUser(user.id)}
+                              >
+                                Editar
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className={user.status === "Activo" 
+                                  ? "text-red-600 border-red-600 hover:bg-red-50" 
+                                  : "text-green-600 border-green-600 hover:bg-green-50"
+                                }
+                                onClick={() => handleToggleUserStatus(user.id)}
+                              >
+                                {user.status === "Activo" ? "Desactivar" : "Activar"}
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
