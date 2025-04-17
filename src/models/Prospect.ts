@@ -12,6 +12,7 @@ export interface Prospect {
   creditType: string;
   contactDate: string;
   agent: string;
+  source?: string;
   status: ProspectStatus;
   notes?: string;
 }
@@ -29,6 +30,7 @@ export const mockProspects: Prospect[] = [
     creditType: "Bancario",
     contactDate: "2025-04-09",
     agent: "Ana Rodríguez",
+    source: "Facebook",
     status: "new"
   },
   {
@@ -42,6 +44,7 @@ export const mockProspects: Prospect[] = [
     creditType: "Infonavit",
     contactDate: "2025-04-08",
     agent: "Juan Pérez",
+    source: "Instagram",
     status: "contacted"
   },
   {
@@ -55,6 +58,7 @@ export const mockProspects: Prospect[] = [
     creditType: "Contado",
     contactDate: "2025-04-07",
     agent: "Ana Rodríguez",
+    source: "Referidos",
     status: "appointment"
   },
   {
@@ -68,6 +72,7 @@ export const mockProspects: Prospect[] = [
     creditType: "Fovissste",
     contactDate: "2025-04-06",
     agent: "Pedro Ramírez",
+    source: "TikTok",
     status: "closed"
   },
   {
@@ -81,6 +86,7 @@ export const mockProspects: Prospect[] = [
     creditType: "Bancario",
     contactDate: "2025-04-05",
     agent: "Juan Pérez",
+    source: "Sitio Web",
     status: "canceled"
   },
   {
@@ -94,6 +100,7 @@ export const mockProspects: Prospect[] = [
     creditType: "Infonavit",
     contactDate: "2025-04-04",
     agent: "Pedro Ramírez",
+    source: "Facebook",
     status: "contacted"
   }
 ];

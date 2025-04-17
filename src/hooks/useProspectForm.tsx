@@ -19,6 +19,7 @@ const prospectFormSchema = z.object({
   maxPrice: z.string(),
   creditType: z.string(),
   assignedTo: z.string(),
+  source: z.string().min(1, { message: "La fuente es obligatoria" }),
   notes: z.string()
 });
 
@@ -39,6 +40,7 @@ export function useProspectForm() {
       maxPrice: "",
       creditType: "",
       assignedTo: "",
+      source: "",
       notes: ""
     },
   });
@@ -62,6 +64,7 @@ export function useProspectForm() {
       creditType: data.creditType,
       contactDate: new Date().toISOString().split('T')[0],
       agent: data.assignedTo,
+      source: data.source,
       status: "new",
       notes: data.notes
     });

@@ -9,5 +9,6 @@ export interface ProspectFormData {
   maxPrice: string;
   creditType: string;
   assignedTo: string;
+  source: string;
   notes: string;
 }

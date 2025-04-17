@@ -11,6 +11,7 @@ import { LocationFields } from "./form-groups/LocationFields";
 import { PriceRangeFields } from "./form-groups/PriceRangeFields";
 import { AssignmentFields } from "./form-groups/AssignmentFields";
 import { NotesField } from "./form-groups/NotesField";
+import { SourceField } from "./form-groups/SourceField";
 
 interface ProspectFormProps {
   form: UseFormReturn<ProspectFormData>;
@@ -38,6 +39,7 @@ export function ProspectForm({
             <div className="space-y-4">
               <PriceRangeFields form={form} />
               <AssignmentFields form={form} />
+              <SourceField form={form} />
               <NotesField form={form} />
             </div>
           </div>
