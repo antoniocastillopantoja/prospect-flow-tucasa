@@ -4,18 +4,36 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { User } from "@/types/settings";
 import { SearchBox } from "@/components/header/SearchBox";
-import { Search, Download } from "lucide-react";
+import { Search, Download, UserCheck, UserX, Edit } from "lucide-react";
 import { convertToCSV } from "@/components/reports/utils/csvUtils";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { EditUserDialog, UserEditValues } from "./EditUserDialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../ui/alert-dialog";
 
 interface UserListProps {
   users: User[];
   onToggleStatus: (userId: string) => void;
-  onEditUser: (userId: string) => void;
+  onEditUser: (userId: string, userData: UserEditValues) => void;
 }
 
 export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
+  
+  // State for the edit dialog
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  
+  // State for confirmation dialog
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [userToToggle, setUserToToggle] = useState<User | null>(null);
   
   // Filter users based on search query
   const filteredUsers = users.filter(user => {
@@ -63,6 +81,24 @@ export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) =
       console.error("Error exporting users to CSV:", error);
     }
   };
+
+  const handleEditClick = (user: User) => {
+    setSelectedUser(user);
+    setEditDialogOpen(true);
+  };
+
+  const handleToggleStatusClick = (user: User) => {
+    setUserToToggle(user);
+    setConfirmDialogOpen(true);
+  };
+
+  const confirmToggleStatus = () => {
+    if (userToToggle) {
+      onToggleStatus(userToToggle.id);
+      setConfirmDialogOpen(false);
+      setUserToToggle(null);
+    }
+  };
   
   return (
     <div className="space-y-4">
@@ -88,25 +124,25 @@ export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) =
         </Button>
       </div>
       
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-2">Nombre</th>
-              <th className="text-left p-2">Correo</th>
-              <th className="text-left p-2">Rol</th>
-              <th className="text-left p-2">Estado</th>
-              <th className="text-left p-2">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
+      <div className="overflow-x-auto border rounded-md">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Correo</TableHead>
+              <TableHead>Rol</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Acciones</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filteredUsers.length > 0 ? (
               filteredUsers.map(user => (
-                <tr key={user.id} className="border-b">
-                  <td className="p-2">{user.name}</td>
-                  <td className="p-2">{user.email}</td>
-                  <td className="p-2">{user.role}</td>
-                  <td className="p-2">
+                <TableRow key={user.id}>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.role}</TableCell>
+                  <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       user.status === "Activo" 
                         ? "bg-green-100 text-green-800" 
@@ -114,15 +150,15 @@ export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) =
                     }`}>
                       {user.status}
                     </span>
-                  </td>
-                  <td className="p-2">
+                  </TableCell>
+                  <TableCell>
                     <div className="flex space-x-2">
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => onEditUser(user.id)}
+                        onClick={() => handleEditClick(user)}
                       >
-                        Editar
+                        <Edit className="h-4 w-4 mr-1" /> Editar
                       </Button>
                       <Button 
                         variant="outline" 
@@ -131,24 +167,67 @@ export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) =
                           ? "text-red-600 border-red-600 hover:bg-red-50" 
                           : "text-green-600 border-green-600 hover:bg-green-50"
                         }
-                        onClick={() => onToggleStatus(user.id)}
+                        onClick={() => handleToggleStatusClick(user)}
                       >
-                        {user.status === "Activo" ? "Desactivar" : "Activar"}
+                        {user.status === "Activo" ? (
+                          <>
+                            <UserX className="h-4 w-4 mr-1" /> Desactivar
+                          </>
+                        ) : (
+                          <>
+                            <UserCheck className="h-4 w-4 mr-1" /> Activar
+                          </>
+                        )}
                       </Button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             ) : (
-              <tr>
-                <td colSpan={5} className="p-4 text-center text-muted-foreground">
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-4">
                   No se encontraron usuarios que coincidan con la búsqueda
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
+      
+      {/* Edit User Dialog */}
+      <EditUserDialog 
+        user={selectedUser}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onUpdateUser={onEditUser}
+      />
+      
+      {/* Confirmation Dialog */}
+      <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {userToToggle?.status === "Activo" 
+                ? "¿Desactivar usuario?" 
+                : "¿Activar usuario?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {userToToggle?.status === "Activo" 
+                ? `Esta acción impedirá que ${userToToggle?.name} inicie sesión en el sistema.` 
+                : `Esta acción permitirá que ${userToToggle?.name} vuelva a iniciar sesión en el sistema.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmToggleStatus}
+              className={userToToggle?.status === "Activo" ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
+            >
+              {userToToggle?.status === "Activo" ? "Desactivar" : "Activar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

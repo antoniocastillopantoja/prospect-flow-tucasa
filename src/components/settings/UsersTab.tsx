@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UserForm, UserFormValues } from "./UserForm";
 import { UserList } from "./UserList";
 import { User } from "@/types/settings";
+import { UserEditValues } from "./EditUserDialog";
 
 export const UsersTab = () => {
   const { toast } = useToast();
@@ -44,25 +45,32 @@ export const UsersTab = () => {
       id: (users.length + 1).toString(),
       name: data.fullName,
       email: data.email,
-      role: data.role,
+      role: capitalizeFirstLetter(data.role),
       status: "Activo"
     };
     
     // Add the new user to the users array
     setUsers([...users, newUser]);
+  };
+
+  const handleEditUser = (userId: string, userData: UserEditValues) => {
+    // Update the user in the users array
+    setUsers(users.map(user => {
+      if (user.id === userId) {
+        return {
+          ...user,
+          name: userData.name,
+          email: userData.email,
+          role: capitalizeFirstLetter(userData.role)
+        };
+      }
+      return user;
+    }));
     
     // Show success toast
     toast({
-      title: "Usuario añadido",
-      description: "Se ha enviado un correo de invitación al nuevo usuario."
-    });
-  };
-
-  const handleEditUser = (userId: string) => {
-    // This would open an edit dialog or form in a real implementation
-    toast({
-      title: "Editar usuario",
-      description: `Editando el usuario con ID ${userId}`
+      title: "Usuario actualizado",
+      description: "Los datos del usuario han sido actualizados correctamente."
     });
   };
 
@@ -84,6 +92,11 @@ export const UsersTab = () => {
       title: "Estado actualizado",
       description: `El usuario ha sido ${newStatus} correctamente.`
     });
+  };
+  
+  // Helper function to capitalize the first letter of each word
+  const capitalizeFirstLetter = (string: string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
   return (
