@@ -55,6 +55,8 @@ const ProspectDetail = () => {
     appointments,
     isSchedulingAppointment,
     appointmentLoading,
+    isCommissionDialogOpen,
+    commissionLoading,
     prospectEditHook,
     handleStatusChange,
     onAppointmentSubmit,
@@ -63,7 +65,9 @@ const ProspectDetail = () => {
     handleDeleteProspect,
     handleAddNote,
     handleCompleteAppointment,
-    handleCancelAppointment
+    handleCancelAppointment,
+    handleCommissionSubmit,
+    handleCommissionCancel
   } = useProspectDetail(initialNotes, initialAppointments);
 
   // Handle appointment submission and tab switching
@@ -104,6 +108,11 @@ const ProspectDetail = () => {
         prospectEditHook={prospectEditHook}
         onDeleteProspect={handleDeleteProspect}
         prospectId={prospect.id}
+        isCommissionDialogOpen={isCommissionDialogOpen}
+        onCommissionDialogOpenChange={setIsCommissionDialogOpen}
+        onCommissionSubmit={handleCommissionSubmit}
+        onCommissionCancel={handleCommissionCancel}
+        commissionLoading={commissionLoading}
       />
     </div>
   );

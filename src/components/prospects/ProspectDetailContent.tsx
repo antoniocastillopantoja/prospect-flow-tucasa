@@ -8,12 +8,13 @@ import ProspectNotesTab from "@/components/prospects/ProspectNotesTab";
 import ProspectAppointmentsTab from "@/components/prospects/ProspectAppointmentsTab";
 import ProspectActivityFeed from "@/components/prospects/ProspectActivityFeed";
 import { Note } from "@/hooks/useProspectNotes";
+import { ProspectStatus } from "@/models/Prospect";
 
 interface ProspectDetailContentProps {
   prospect: any;
   notes: Note[];
   appointments: any[];
-  onStatusChange: (status: any) => void;
+  onStatusChange: (status: ProspectStatus) => void;
   onScheduleAppointment: () => void;
   onEdit: () => void;
   onAddNote: (note: string) => void;

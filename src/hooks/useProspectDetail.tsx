@@ -7,6 +7,7 @@ import { ProspectStatus } from "@/models/Prospect";
 import { useProspectEdit } from "@/hooks/useProspectEdit";
 import { useProspectNotes, Note } from "@/hooks/useProspectNotes";
 import { useAppointments, Appointment } from "@/hooks/useAppointments";
+import { PropertyCommissionFormData } from "@/components/prospects/dialogs/PropertyCommissionDialog";
 
 export function useProspectDetail(initialNotes: Note[] = [], initialAppointments: Appointment[] = []) {
   const { id } = useParams();
@@ -16,6 +17,9 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
   
   const [prospect, setProspect] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isCommissionDialogOpen, setIsCommissionDialogOpen] = useState(false);
+  const [commissionLoading, setCommissionLoading] = useState(false);
+  const [pendingStatusChange, setPendingStatusChange] = useState<ProspectStatus | null>(null);
 
   // Hooks
   const { notes, handleAddNote, setNotes } = useProspectNotes(initialNotes);
@@ -36,14 +40,52 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
   
   const handleStatusChange = (newStatus: ProspectStatus) => {
     if (prospect && id) {
-      updateProspectStatus(parseInt(id), newStatus);
-      setProspect({ ...prospect, status: newStatus });
-      
-      // If setting to appointment status, check for existing appointments
-      if (newStatus === "appointment" && appointments.length === 0) {
-        handleScheduleAppointment();
+      if (newStatus === "closed") {
+        setPendingStatusChange(newStatus);
+        setIsCommissionDialogOpen(true);
+      } else {
+        updateProspectStatus(parseInt(id), newStatus);
+        setProspect({ ...prospect, status: newStatus });
+        
+        // If setting to appointment status, check for existing appointments
+        if (newStatus === "appointment" && appointments.length === 0) {
+          handleScheduleAppointment();
+        }
       }
     }
+  };
+
+  const handleCommissionSubmit = (data: PropertyCommissionFormData) => {
+    if (prospect && id && pendingStatusChange === "closed") {
+      setCommissionLoading(true);
+      
+      // Update prospect with property ID and commission percentage
+      const updatedProspect = {
+        ...prospect,
+        propertyId: data.propertyId,
+        commissionPercentage: data.commissionPercentage,
+        status: pendingStatusChange
+      };
+      
+      // Simulate API call delay
+      setTimeout(() => {
+        updateProspect(parseInt(id), updatedProspect);
+        setProspect(updatedProspect);
+        setCommissionLoading(false);
+        setIsCommissionDialogOpen(false);
+        setPendingStatusChange(null);
+        
+        toast({
+          title: "Cliente cerrado exitosamente",
+          description: `Propiedad ${data.propertyId} con ${data.commissionPercentage}% de comisión`
+        });
+      }, 500);
+    }
+  };
+
+  const handleCommissionCancel = () => {
+    setIsCommissionDialogOpen(false);
+    setPendingStatusChange(null);
   };
 
   // Ensure this function returns the promise from handleAppointmentSubmit
@@ -105,6 +147,8 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     appointments,
     isSchedulingAppointment,
     appointmentLoading,
+    isCommissionDialogOpen,
+    commissionLoading,
     prospectEditHook,
     handleStatusChange,
     onAppointmentSubmit,
@@ -113,6 +157,8 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     handleDeleteProspect,
     handleAddNote,
     handleCompleteAppointment,
-    handleCancelAppointment
+    handleCancelAppointment,
+    handleCommissionSubmit,
+    handleCommissionCancel
   };
 }

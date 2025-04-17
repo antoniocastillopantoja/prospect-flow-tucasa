@@ -2,6 +2,7 @@
 import React from "react";
 import AppointmentDialog from "@/components/prospects/dialogs/AppointmentDialog";
 import EditProspectDialog from "@/components/prospects/dialogs/EditProspectDialog";
+import PropertyCommissionDialog, { PropertyCommissionFormData } from "@/components/prospects/dialogs/PropertyCommissionDialog";
 
 interface ProspectDetailDialogsProps {
   isSchedulingAppointment: boolean;
@@ -12,6 +13,11 @@ interface ProspectDetailDialogsProps {
   prospectEditHook: any;
   onDeleteProspect: () => void;
   prospectId: number;
+  isCommissionDialogOpen?: boolean;
+  onCommissionDialogOpenChange?: (open: boolean) => void;
+  onCommissionSubmit?: (data: PropertyCommissionFormData) => void;
+  onCommissionCancel?: () => void;
+  commissionLoading?: boolean;
 }
 
 const ProspectDetailDialogs: React.FC<ProspectDetailDialogsProps> = ({
@@ -22,7 +28,12 @@ const ProspectDetailDialogs: React.FC<ProspectDetailDialogsProps> = ({
   onAppointmentCancel,
   prospectEditHook,
   onDeleteProspect,
-  prospectId
+  prospectId,
+  isCommissionDialogOpen = false,
+  onCommissionDialogOpenChange = () => {},
+  onCommissionSubmit = () => {},
+  onCommissionCancel = () => {},
+  commissionLoading = false
 }) => {
   return (
     <>
@@ -45,6 +56,14 @@ const ProspectDetailDialogs: React.FC<ProspectDetailDialogsProps> = ({
         onSubmit={onAppointmentSubmit}
         onCancel={onAppointmentCancel}
         isLoading={appointmentLoading}
+      />
+
+      <PropertyCommissionDialog
+        isOpen={isCommissionDialogOpen}
+        onOpenChange={onCommissionDialogOpenChange}
+        onSubmit={onCommissionSubmit}
+        onCancel={onCommissionCancel}
+        isLoading={commissionLoading}
       />
     </>
   );

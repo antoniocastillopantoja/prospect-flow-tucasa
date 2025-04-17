@@ -15,6 +15,8 @@ export interface Prospect {
   source?: string;
   status: ProspectStatus;
   notes?: string;
+  propertyId?: string;
+  commissionPercentage?: string;
 }
 
 // Mock data for prospects
