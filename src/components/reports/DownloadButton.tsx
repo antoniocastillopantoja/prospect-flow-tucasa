@@ -20,6 +20,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { mockProspects } from "@/models/Prospect";
+import * as XLSX from 'xlsx';
 
 interface DownloadButtonProps {
   reportType: string;
@@ -100,24 +102,70 @@ export const DownloadButton = ({
     setShowDownloadDialog(true);
   };
 
+  const getProspectsBySource = () => {
+    const prospectsBySource: Record<string, any[]> = {};
+    
+    mockProspects.forEach(prospect => {
+      const source = prospect.source || "Desconocido";
+      if (!prospectsBySource[source]) {
+        prospectsBySource[source] = [];
+      }
+      prospectsBySource[source].push({
+        ID: prospect.id,
+        Nombre: prospect.name,
+        Teléfono: prospect.phone,
+        Email: prospect.email || "",
+        Ubicación: prospect.location,
+        Sector: prospect.sector,
+        "Rango de Precio": prospect.priceRange,
+        "Tipo de Crédito": prospect.creditType,
+        "Fecha de Contacto": prospect.contactDate,
+        Agente: prospect.agent,
+        Estado: prospect.status,
+        Notas: prospect.notes || ""
+      });
+    });
+    
+    return prospectsBySource;
+  };
+
   const handleDownloadReport = () => {
     setIsDownloading(true);
 
     try {
-      const dataToExport = getReportDataByType();
       const reportLabel = getReportLabel();
-      const filename = `reporte-${reportLabel}-${timeframe}.csv`;
+      const filename = `reporte-${reportLabel}-${timeframe}.xlsx`;
       
-      const csvData = convertToCSV(dataToExport);
-
-      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Create a new workbook
+      const wb = XLSX.utils.book_new();
+      
+      // Add the summary data as the first sheet
+      const summaryData = getReportDataByType();
+      const summaryWs = XLSX.utils.json_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(wb, summaryWs, "Resumen");
+      
+      // If this is a source report, add detailed prospect data by source
+      if (selectedReportType === "fuente") {
+        const prospectsBySource = getProspectsBySource();
+        
+        // Create a sheet with all prospects
+        const allProspectsData = Object.values(prospectsBySource).flat();
+        const allProspectsWs = XLSX.utils.json_to_sheet(allProspectsData);
+        XLSX.utils.book_append_sheet(wb, allProspectsWs, "Todos los Prospectos");
+        
+        // Create individual sheets for each source
+        Object.entries(prospectsBySource).forEach(([source, prospects]) => {
+          if (prospects.length > 0) {
+            const sourceWs = XLSX.utils.json_to_sheet(prospects);
+            // Limit sheet name to 31 characters (Excel limitation)
+            const sheetName = source.substring(0, 28) + (source.length > 28 ? "..." : "");
+            XLSX.utils.book_append_sheet(wb, sourceWs, sheetName);
+          }
+        });
+      }
+      
+      // Write the workbook and trigger download
+      XLSX.writeFile(wb, filename);
 
       toast({
         title: "Reporte descargado",
@@ -193,6 +241,11 @@ export const DownloadButton = ({
                 timeframe === 'semana' ? 'última semana' : 
                 timeframe === 'trimestre' ? 'último trimestre' : 'último año'
               }?
+              {selectedReportType === "fuente" && (
+                <p className="mt-2">
+                  Este reporte incluirá hojas adicionales con los datos completos de cada prospecto organizados por fuente.
+                </p>
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2">
