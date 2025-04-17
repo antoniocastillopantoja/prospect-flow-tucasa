@@ -14,12 +14,14 @@ interface UserListTableProps {
   filteredUsers: User[];
   onEditClick: (user: User) => void;
   onToggleStatusClick: (user: User) => void;
+  onDeleteClick: (user: User) => void;
 }
 
 export const UserListTable = ({ 
   filteredUsers, 
   onEditClick, 
-  onToggleStatusClick 
+  onToggleStatusClick,
+  onDeleteClick
 }: UserListTableProps) => {
   return (
     <div className="overflow-x-auto border rounded-md">
@@ -53,7 +55,8 @@ export const UserListTable = ({
                   <UserListActions 
                     user={user} 
                     onEditClick={onEditClick} 
-                    onToggleStatusClick={onToggleStatusClick} 
+                    onToggleStatusClick={onToggleStatusClick}
+                    onDeleteClick={onDeleteClick} 
                   />
                 </TableCell>
               </TableRow>

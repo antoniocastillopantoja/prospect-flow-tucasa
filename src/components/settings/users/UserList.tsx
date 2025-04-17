@@ -5,15 +5,24 @@ import { User } from "@/types/settings";
 import { UserListHeader } from "./UserListHeader";
 import { UserListTable } from "./UserListTable";
 import { ConfirmToggleDialog } from "./ConfirmToggleDialog";
+import { ConfirmDeleteDialog } from "./ConfirmDeleteDialog";
 import { EditUserDialog, UserEditValues } from "../EditUserDialog";
 
 interface UserListProps {
   users: User[];
   onToggleStatus: (userId: string) => void;
   onEditUser: (userId: string, userData: UserEditValues) => void;
+  onDeleteUser: (userId: string) => void;
+  checkUserCanBeDeleted: (userId: string) => boolean;
 }
 
-export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) => {
+export const UserList = ({ 
+  users, 
+  onToggleStatus, 
+  onEditUser, 
+  onDeleteUser,
+  checkUserCanBeDeleted 
+}: UserListProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
   
@@ -24,6 +33,11 @@ export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) =
   // State for confirmation dialog
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [userToToggle, setUserToToggle] = useState<User | null>(null);
+  
+  // State for delete confirmation dialog
+  const [confirmDeleteDialogOpen, setConfirmDeleteDialogOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [canDeleteUser, setCanDeleteUser] = useState(false);
   
   // Filter users based on search query
   const filteredUsers = users.filter(user => {
@@ -55,6 +69,21 @@ export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) =
     }
   };
   
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    const canDelete = checkUserCanBeDeleted(user.id);
+    setCanDeleteUser(canDelete);
+    setConfirmDeleteDialogOpen(true);
+  };
+  
+  const confirmDeleteUser = () => {
+    if (userToDelete && canDeleteUser) {
+      onDeleteUser(userToDelete.id);
+      setConfirmDeleteDialogOpen(false);
+      setUserToDelete(null);
+    }
+  };
+  
   return (
     <div className="space-y-4">
       <UserListHeader 
@@ -67,6 +96,7 @@ export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) =
         filteredUsers={filteredUsers}
         onEditClick={handleEditClick}
         onToggleStatusClick={handleToggleStatusClick}
+        onDeleteClick={handleDeleteClick}
       />
       
       {/* Edit User Dialog */}
@@ -83,6 +113,15 @@ export const UserList = ({ users, onToggleStatus, onEditUser }: UserListProps) =
         onOpenChange={setConfirmDialogOpen}
         user={userToToggle}
         onConfirm={confirmToggleStatus}
+      />
+      
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={confirmDeleteDialogOpen}
+        onOpenChange={setConfirmDeleteDialogOpen}
+        user={userToDelete}
+        onConfirm={confirmDeleteUser}
+        canDelete={canDeleteUser}
       />
     </div>
   );

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { 
   Card, 
@@ -11,6 +12,13 @@ import { UserForm, UserFormValues } from "./UserForm";
 import { UserList } from "./users/UserList";
 import { User } from "@/types/settings";
 import { UserEditValues } from "./EditUserDialog";
+
+// Sample data to simulate user relationships with other entities
+const userRelationships = {
+  "1": ["prospect_1", "appointment_2"], // User has relationships
+  "2": [],  // User has no relationships
+  "3": ["prospect_3", "prospect_4", "appointment_5"]  // User has relationships
+};
 
 export const UsersTab = () => {
   const { toast } = useToast();
@@ -123,6 +131,33 @@ export const UsersTab = () => {
     });
   };
   
+  const handleDeleteUser = (userId: string) => {
+    // Delete the user from the users array
+    setUsers(users.filter(user => user.id !== userId));
+    
+    // Update the temp passwords if needed
+    const deletedUser = users.find(user => user.id === userId);
+    if (deletedUser) {
+      const tempPasswords = JSON.parse(localStorage.getItem("tempPasswords") || "{}");
+      if (tempPasswords[deletedUser.email]) {
+        delete tempPasswords[deletedUser.email];
+        localStorage.setItem("tempPasswords", JSON.stringify(tempPasswords));
+      }
+    }
+    
+    // Show success toast
+    toast({
+      title: "Usuario eliminado",
+      description: "El usuario ha sido eliminado correctamente."
+    });
+  };
+  
+  const checkUserCanBeDeleted = (userId: string): boolean => {
+    // Check if the user has any relationships with other entities
+    const relationships = userRelationships[userId as keyof typeof userRelationships] || [];
+    return relationships.length === 0;
+  };
+  
   // Helper function to capitalize the first letter of each word
   const capitalizeFirstLetter = (string: string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -154,6 +189,8 @@ export const UsersTab = () => {
             users={users}
             onToggleStatus={handleToggleUserStatus}
             onEditUser={handleEditUser}
+            onDeleteUser={handleDeleteUser}
+            checkUserCanBeDeleted={checkUserCanBeDeleted}
           />
         </CardContent>
       </Card>
