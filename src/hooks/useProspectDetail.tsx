@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -140,6 +139,14 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     }
   }, [prospects, id, navigate, toast]);
 
+  // Add a method to handle dialog open change
+  const handleCommissionDialogOpenChange = (open: boolean) => {
+    if (!open && pendingStatusChange === "closed") {
+      setPendingStatusChange(null);
+    }
+    setIsCommissionDialogOpen(open);
+  };
+
   return {
     prospect,
     loading,
@@ -159,6 +166,7 @@ export function useProspectDetail(initialNotes: Note[] = [], initialAppointments
     handleCompleteAppointment,
     handleCancelAppointment,
     handleCommissionSubmit,
-    handleCommissionCancel
+    handleCommissionCancel,
+    handleCommissionDialogOpenChange
   };
 }

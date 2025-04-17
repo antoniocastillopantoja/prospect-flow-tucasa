@@ -67,11 +67,11 @@ const ProspectDetail = () => {
     handleCompleteAppointment,
     handleCancelAppointment,
     handleCommissionSubmit,
-    handleCommissionCancel
+    handleCommissionCancel,
+    handleCommissionDialogOpenChange // Add this line to destructure the function
   } = useProspectDetail(initialNotes, initialAppointments);
 
   // Handle appointment submission and tab switching
-  // Fix the Promise issue by properly handling the async result
   const handleAppointmentSubmit = async (data: any) => {
     const tabToSwitch = await onAppointmentSubmit(data);
     if (tabToSwitch) {
@@ -109,7 +109,7 @@ const ProspectDetail = () => {
         onDeleteProspect={handleDeleteProspect}
         prospectId={prospect.id}
         isCommissionDialogOpen={isCommissionDialogOpen}
-        onCommissionDialogOpenChange={setIsCommissionDialogOpen}
+        onCommissionDialogOpenChange={handleCommissionDialogOpenChange} // Use the destructured function
         onCommissionSubmit={handleCommissionSubmit}
         onCommissionCancel={handleCommissionCancel}
         commissionLoading={commissionLoading}
