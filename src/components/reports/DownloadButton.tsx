@@ -12,16 +12,31 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { getReportData, reportTypes } from "./reportData";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface DownloadButtonProps {
   reportType: string;
   timeframe: string;
   getData: () => any[];
+  onReportTypeChange: (type: string) => void;
 }
 
-export const DownloadButton = ({ reportType, timeframe, getData }: DownloadButtonProps) => {
+export const DownloadButton = ({ 
+  reportType, 
+  timeframe, 
+  getData, 
+  onReportTypeChange 
+}: DownloadButtonProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [selectedReportType, setSelectedReportType] = useState<string>("fuente");
+  const [showDownloadDialog, setShowDownloadDialog] = useState(false);
   const { toast } = useToast();
 
   const convertToCSV = (data: any[]) => {
@@ -79,6 +94,12 @@ export const DownloadButton = ({ reportType, timeframe, getData }: DownloadButto
     }
   };
 
+  const handleReportTypeSelect = (type: string) => {
+    setSelectedReportType(type);
+    onReportTypeChange(type);
+    setShowDownloadDialog(true);
+  };
+
   const handleDownloadReport = () => {
     setIsDownloading(true);
 
@@ -105,6 +126,8 @@ export const DownloadButton = ({ reportType, timeframe, getData }: DownloadButto
           timeframe === 'trimestre' ? 'último trimestre' : 'último año'}`,
         variant: "default",
       });
+      
+      setShowDownloadDialog(false);
     } catch (error) {
       console.error("Error downloading report:", error);
       toast({
@@ -118,65 +141,86 @@ export const DownloadButton = ({ reportType, timeframe, getData }: DownloadButto
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          variant="outline" 
-          disabled={isDownloading}
-          className="gap-2"
-        >
-          {isDownloading ? (
-            <>
-              <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-              Descargando...
-            </>
-          ) : (
-            <>
-              <FileDown className="h-4 w-4" /> 
-              Descargar Reporte
-            </>
-          )}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Tipo de reporte</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          onClick={() => setSelectedReportType("fuente")}
-          className={selectedReportType === "fuente" ? "bg-accent" : ""}
-        >
-          Prospectos por fuente
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => setSelectedReportType("estado")}
-          className={selectedReportType === "estado" ? "bg-accent" : ""}
-        >
-          Prospectos por estado
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => setSelectedReportType("sector")}
-          className={selectedReportType === "sector" ? "bg-accent" : ""}
-        >
-          Prospectos por sector
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => setSelectedReportType("agente")}
-          className={selectedReportType === "agente" ? "bg-accent" : ""}
-        >
-          Prospectos por agente
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => setSelectedReportType("rendimiento")}
-          className={selectedReportType === "rendimiento" ? "bg-accent" : ""}
-        >
-          Rendimiento de agentes
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleDownloadReport}>
-          <FileDown className="h-4 w-4 mr-2" /> 
-          Descargar {getReportLabel()}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button 
+            variant="outline" 
+            disabled={isDownloading}
+            className="gap-2"
+          >
+            {isDownloading ? (
+              <>
+                <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                Descargando...
+              </>
+            ) : (
+              <>
+                <FileDown className="h-4 w-4" /> 
+                Descargar Reporte
+              </>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Tipo de reporte</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => handleReportTypeSelect("fuente")}>
+            Prospectos por fuente
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleReportTypeSelect("estado")}>
+            Prospectos por estado
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleReportTypeSelect("sector")}>
+            Prospectos por sector
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleReportTypeSelect("agente")}>
+            Prospectos por agente
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleReportTypeSelect("rendimiento")}>
+            Rendimiento de agentes
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog open={showDownloadDialog} onOpenChange={setShowDownloadDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Descargar Reporte</DialogTitle>
+            <DialogDescription>
+              ¿Desea descargar el reporte de {getReportLabel()} para el {
+                timeframe === 'mes' ? 'último mes' : 
+                timeframe === 'semana' ? 'última semana' : 
+                timeframe === 'trimestre' ? 'último trimestre' : 'último año'
+              }?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDownloadDialog(false)}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleDownloadReport}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <>
+                  <span className="h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></span>
+                  Descargando...
+                </>
+              ) : (
+                <>
+                  <FileDown className="h-4 w-4 mr-2" /> 
+                  Descargar
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

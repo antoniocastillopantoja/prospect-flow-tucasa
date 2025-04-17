@@ -39,6 +39,7 @@ const ReportsPage = () => {
           reportType={reportType}
           timeframe={timeframe}
           getData={getDataForDownload}
+          onReportTypeChange={handleReportTypeChange}
         />
       </div>
       
