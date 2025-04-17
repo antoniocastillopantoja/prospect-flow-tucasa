@@ -1,11 +1,33 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CalendarIcon, MapPin, Clock, User } from "lucide-react";
+import { CalendarIcon, MapPin, Clock, User, Search, SortAsc, SortDesc, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Appointment } from "@/hooks/useCalendarPage";
+import { Input } from "@/components/ui/input";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  sortAppointments,
+  filterAppointmentsByType,
+  filterAppointmentsBySearch,
+  getUniqueAppointmentTypes,
+  SortOption,
+  SortDirection
+} from "@/utils/appointmentUtils";
 
 interface AppointmentsListProps {
   date: Date | undefined;
@@ -18,6 +40,41 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
   appointments,
   onGoToClient
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>("time");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const [filteredAppointments, setFilteredAppointments] = useState<Appointment[]>(appointments);
+  const uniqueTypes = getUniqueAppointmentTypes(appointments);
+  
+  useEffect(() => {
+    let result = [...appointments];
+    
+    // Apply type filter
+    result = filterAppointmentsByType(result, typeFilter);
+    
+    // Apply search filter
+    result = filterAppointmentsBySearch(result, searchTerm);
+    
+    // Apply sorting
+    result = sortAppointments(result, sortBy, sortDirection);
+    
+    setFilteredAppointments(result);
+  }, [appointments, searchTerm, typeFilter, sortBy, sortDirection]);
+  
+  const toggleSortDirection = () => {
+    setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+  };
+  
+  const handleSortChange = (option: SortOption) => {
+    if (sortBy === option) {
+      toggleSortDirection();
+    } else {
+      setSortBy(option);
+      setSortDirection("asc");
+    }
+  };
+
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardContent className="p-4">
@@ -31,9 +88,62 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
           </Button>
         </div>
         
-        {appointments.length > 0 ? (
+        {/* Search and Filters */}
+        <div className="mb-4 space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input 
+                className="pl-8"
+                placeholder="Buscar citas..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <Select
+              value={typeFilter || ""}
+              onValueChange={(value) => setTypeFilter(value || null)}
+            >
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Filtrar por tipo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todos los tipos</SelectItem>
+                {uniqueTypes.map((type) => (
+                  <SelectItem key={type} value={type}>{type}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-1">
+                  {sortDirection === "asc" ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+                  Ordenar
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleSortChange("time")}>
+                  Por hora {sortBy === "time" && (sortDirection === "asc" ? "↑" : "↓")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("client")}>
+                  Por cliente {sortBy === "client" && (sortDirection === "asc" ? "↑" : "↓")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("type")}>
+                  Por tipo {sortBy === "type" && (sortDirection === "asc" ? "↑" : "↓")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange("location")}>
+                  Por ubicación {sortBy === "location" && (sortDirection === "asc" ? "↑" : "↓")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+        
+        {filteredAppointments.length > 0 ? (
           <div className="space-y-4">
-            {appointments.map((appointment) => (
+            {filteredAppointments.map((appointment) => (
               <div 
                 key={appointment.id}
                 className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
@@ -75,7 +185,9 @@ const AppointmentsList: React.FC<AppointmentsListProps> = ({
           </div>
         ) : (
           <div className="text-center py-12 text-gray-500">
-            No hay citas programadas para este día
+            {searchTerm || typeFilter 
+              ? "No se encontraron citas que coincidan con los filtros actuales" 
+              : "No hay citas programadas para este día"}
           </div>
         )}
       </CardContent>
