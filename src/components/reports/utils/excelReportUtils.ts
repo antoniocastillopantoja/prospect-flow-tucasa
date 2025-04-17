@@ -1,4 +1,3 @@
-
 import * as XLSX from 'xlsx';
 import { mockProspects } from "@/models/Prospect";
 import { reportTypes } from "../reportData";
@@ -57,6 +56,34 @@ export const getProspectsByStatus = () => {
   });
   
   return prospectsByStatus;
+};
+
+// Get prospects data organized by sector
+export const getProspectsBySector = () => {
+  const prospectsBySector: Record<string, any[]> = {};
+  
+  mockProspects.forEach(prospect => {
+    const sector = prospect.sector || "Desconocido";
+    if (!prospectsBySector[sector]) {
+      prospectsBySector[sector] = [];
+    }
+    prospectsBySector[sector].push({
+      ID: prospect.id,
+      Nombre: prospect.name,
+      Teléfono: prospect.phone,
+      Email: prospect.email || "",
+      Ubicación: prospect.location,
+      "Rango de Precio": prospect.priceRange,
+      "Tipo de Crédito": prospect.creditType,
+      "Fecha de Contacto": prospect.contactDate,
+      Agente: prospect.agent,
+      Fuente: prospect.source || "Desconocido",
+      Estado: prospect.status,
+      Notas: prospect.notes || ""
+    });
+  });
+  
+  return prospectsBySector;
 };
 
 // Convert data to CSV format
@@ -145,6 +172,26 @@ export const generateExcelWorkbook = (reportType: string, timeframe: string) => 
         // Limit sheet name to 31 characters (Excel limitation)
         const sheetName = status.substring(0, 28) + (status.length > 28 ? "..." : "");
         XLSX.utils.book_append_sheet(wb, statusWs, sheetName);
+      }
+    });
+  }
+  
+  // If this is a sector report, add detailed prospect data by sector
+  if (reportType === "sector") {
+    const prospectsBySector = getProspectsBySector();
+    
+    // Create a sheet with all prospects
+    const allProspectsData = Object.values(prospectsBySector).flat();
+    const allProspectsWs = XLSX.utils.json_to_sheet(allProspectsData);
+    XLSX.utils.book_append_sheet(wb, allProspectsWs, "Todos los Prospectos");
+    
+    // Create individual sheets for each sector
+    Object.entries(prospectsBySector).forEach(([sector, prospects]) => {
+      if (prospects.length > 0) {
+        const sectorWs = XLSX.utils.json_to_sheet(prospects);
+        // Limit sheet name to 31 characters (Excel limitation)
+        const sheetName = sector.substring(0, 28) + (sector.length > 28 ? "..." : "");
+        XLSX.utils.book_append_sheet(wb, sectorWs, sheetName);
       }
     });
   }

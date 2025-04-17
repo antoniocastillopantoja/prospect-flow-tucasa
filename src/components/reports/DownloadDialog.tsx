@@ -18,6 +18,7 @@ interface DownloadDialogProps {
   timeframe: string;
   isSourceReport: boolean;
   isStatusReport: boolean;
+  isSectorReport: boolean;
   onDownload: () => void;
   isDownloading: boolean;
 }
@@ -29,6 +30,7 @@ export const DownloadDialog = ({
   timeframe,
   isSourceReport,
   isStatusReport,
+  isSectorReport,
   onDownload,
   isDownloading
 }: DownloadDialogProps) => {
@@ -47,6 +49,11 @@ export const DownloadDialog = ({
             {isStatusReport && (
               <p className="mt-2">
                 Este reporte incluirá hojas adicionales con los datos completos de cada prospecto organizados por estado.
+              </p>
+            )}
+            {isSectorReport && (
+              <p className="mt-2">
+                Este reporte incluirá hojas adicionales con los datos completos de cada prospecto organizados por sector.
               </p>
             )}
           </DialogDescription>
