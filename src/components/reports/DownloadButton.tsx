@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
@@ -54,10 +53,8 @@ export const DownloadButton = ({
       const reportLabel = getReportLabel(selectedReportType);
       const filename = getReportFilename(reportLabel, timeframe);
       
-      // Generate Excel workbook
       const wb = generateExcelWorkbook(selectedReportType, timeframe);
       
-      // Write the workbook and trigger download
       XLSX.writeFile(wb, filename);
 
       toast({
@@ -130,6 +127,7 @@ export const DownloadButton = ({
         isSourceReport={selectedReportType === "fuente"}
         isStatusReport={selectedReportType === "estado"}
         isSectorReport={selectedReportType === "sector"}
+        isAgentReport={selectedReportType === "agente"}
         onDownload={handleDownloadReport}
         isDownloading={isDownloading}
       />

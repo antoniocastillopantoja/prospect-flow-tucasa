@@ -86,6 +86,34 @@ export const getProspectsBySector = () => {
   return prospectsBySector;
 };
 
+// Get prospects data organized by agent
+export const getProspectsByAgent = () => {
+  const prospectsByAgent: Record<string, any[]> = {};
+  
+  mockProspects.forEach(prospect => {
+    const agent = prospect.agent || "Sin asignar";
+    if (!prospectsByAgent[agent]) {
+      prospectsByAgent[agent] = [];
+    }
+    prospectsByAgent[agent].push({
+      ID: prospect.id,
+      Nombre: prospect.name,
+      Teléfono: prospect.phone,
+      Email: prospect.email || "",
+      Ubicación: prospect.location,
+      Sector: prospect.sector,
+      "Rango de Precio": prospect.priceRange,
+      "Tipo de Crédito": prospect.creditType,
+      "Fecha de Contacto": prospect.contactDate,
+      Fuente: prospect.source || "Desconocido",
+      Estado: prospect.status,
+      Notas: prospect.notes || ""
+    });
+  });
+  
+  return prospectsByAgent;
+};
+
 // Convert data to CSV format
 export const convertToCSV = (data: any[]) => {
   if (!data || !data.length) return '';
@@ -192,6 +220,26 @@ export const generateExcelWorkbook = (reportType: string, timeframe: string) => 
         // Limit sheet name to 31 characters (Excel limitation)
         const sheetName = sector.substring(0, 28) + (sector.length > 28 ? "..." : "");
         XLSX.utils.book_append_sheet(wb, sectorWs, sheetName);
+      }
+    });
+  }
+  
+  // If this is an agent report, add detailed prospect data by agent
+  if (reportType === "agente") {
+    const prospectsByAgent = getProspectsByAgent();
+    
+    // Create a sheet with all prospects
+    const allProspectsData = Object.values(prospectsByAgent).flat();
+    const allProspectsWs = XLSX.utils.json_to_sheet(allProspectsData);
+    XLSX.utils.book_append_sheet(wb, allProspectsWs, "Todos los Prospectos");
+    
+    // Create individual sheets for each agent
+    Object.entries(prospectsByAgent).forEach(([agent, prospects]) => {
+      if (prospects.length > 0) {
+        const agentWs = XLSX.utils.json_to_sheet(prospects);
+        // Limit sheet name to 31 characters (Excel limitation)
+        const sheetName = agent.substring(0, 28) + (agent.length > 28 ? "..." : "");
+        XLSX.utils.book_append_sheet(wb, agentWs, sheetName);
       }
     });
   }
