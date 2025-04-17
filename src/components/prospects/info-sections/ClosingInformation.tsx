@@ -72,7 +72,7 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center">
             <Building className="h-4 w-4 mr-2 text-green-600" />
-            <span className="text-green-700">Propiedad vendida: {propertyId}</span>
+            <span className="text-green-700">ID de Propiedad vendida: {propertyId}</span>
           </div>
           <div className="flex items-center">
             <Percent className="h-4 w-4 mr-2 text-green-600" />
@@ -109,3 +109,4 @@ const ClosingInformation: React.FC<ClosingInformationProps> = ({
 };
 
 export default ClosingInformation;
+
