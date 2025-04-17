@@ -20,7 +20,7 @@ interface ProspectDetailContentProps {
   onAddNote: (note: string) => void;
   onCompleteAppointment?: (id: number) => void;
   onCancelAppointment?: (id: number) => void;
-  onUpdateClosingInfo?: (propertyId: string, commissionPercentage: string) => void;
+  onUpdateClosingInfo?: (propertyId: string, commissionPercentage: string, negotiatedPrice: string) => void;
 }
 
 const ProspectDetailContent: React.FC<ProspectDetailContentProps> = ({
