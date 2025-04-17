@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, MapPin } from "lucide-react";
+import { Home, MapPin, ExternalLink } from "lucide-react";
 import ProspectStatusBadge from "@/components/ProspectStatusBadge";
 import { Prospect as ModelProspect } from "@/models/Prospect";
 import "./dashboard.css";
@@ -88,6 +88,12 @@ const RecentProspects: React.FC<RecentProspectsProps> = ({ allProspects }) => {
                     <span>{prospect.priceRange}</span>
                   </div>
                 </div>
+                {prospect.source && (
+                  <div className="flex items-center text-sm text-gray-500 mt-1">
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    <span>Fuente: {prospect.source}</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>

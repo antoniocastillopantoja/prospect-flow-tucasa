@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Home, MapPin, Phone, User } from "lucide-react";
+import { Calendar, Home, MapPin, Phone, User, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import ProspectStatusBadge from "@/components/ProspectStatusBadge";
@@ -60,6 +60,12 @@ const ProspectCard: React.FC<ProspectCardProps> = ({ prospect, onStatusChange })
             <User className="h-4 w-4 mr-2 text-gray-500" />
             <span>{prospect.agent}</span>
           </div>
+          {prospect.source && (
+            <div className="flex items-center text-sm">
+              <ExternalLink className="h-4 w-4 mr-2 text-gray-500" />
+              <span>Fuente: {prospect.source}</span>
+            </div>
+          )}
         </div>
         
         <div className="flex gap-2 mt-3 pt-3 border-t">
