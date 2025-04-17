@@ -61,6 +61,9 @@ export const DownloadDialog = ({
             {isAgentReport && (
               <p className="mt-2">
                 Este reporte incluirá hojas adicionales con los datos completos de cada prospecto organizados por agente.
+                {reportLabel.includes('rendimiento') && (
+                  <span> También incluirá hojas con los datos completos de cada prospecto organizados por estado.</span>
+                )}
               </p>
             )}
           </DialogDescription>
