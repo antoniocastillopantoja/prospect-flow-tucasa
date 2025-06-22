@@ -101,7 +101,7 @@ const LoginForm = ({ onForgotPassword }: LoginFormProps) => {
       <CardFooter>
         <Button 
           type="submit" 
-          className="w-full" 
+          className="w-full font-bold" 
           disabled={isLoading}
         >
           {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
