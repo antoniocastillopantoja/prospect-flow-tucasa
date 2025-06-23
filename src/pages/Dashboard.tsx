@@ -2,6 +2,7 @@
 import MetricsCards from "@/components/dashboard/MetricsCards";
 import AppointmentsList from "@/components/dashboard/AppointmentsList";
 import RecentProspects from "@/components/dashboard/RecentProspects";
+import AIAgentButton from "@/components/ai-agent/AIAgentButton";
 import { useSearchContext } from "@/contexts/SearchContext";
 import { useProspects } from "@/hooks/useProspects";
 import { useState, useEffect } from "react";
@@ -85,6 +86,9 @@ const Dashboard = () => {
         {/* Recent Prospects */}
         <RecentProspects allProspects={filteredProspects} />
       </div>
+      
+      {/* AI Agent Button */}
+      <AIAgentButton />
     </div>
   );
 };
