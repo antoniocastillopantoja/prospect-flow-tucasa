@@ -4,6 +4,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AppHeader } from "@/components/AppHeader";
+import AIAgentButton from "@/components/ai-agent/AIAgentButton";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AppLayout = () => {
@@ -32,6 +33,8 @@ const AppLayout = () => {
             <Outlet />
           </main>
         </div>
+        {/* AI Agent Button - Available on all pages */}
+        <AIAgentButton />
       </div>
     </SidebarProvider>
   );
