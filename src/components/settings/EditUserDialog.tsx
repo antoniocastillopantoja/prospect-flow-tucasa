@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -32,6 +31,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ChangeEvent } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 // Define schema for user edit form validation
 export const userEditSchema = z.object({
@@ -56,6 +57,8 @@ export const EditUserDialog = ({ user, open, onOpenChange, onUpdateUser }: EditU
   const [hasTempPassword, setHasTempPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [temporaryPassword, setTemporaryPassword] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   
   const form = useForm<UserEditValues>({
     resolver: zodResolver(userEditSchema),
@@ -87,6 +90,15 @@ export const EditUserDialog = ({ user, open, onOpenChange, onUpdateUser }: EditU
     }
   }, [user?.email, form]);
 
+  useEffect(() => {
+    if (user?.avatar_url) {
+      setAvatarPreview(user.avatar_url);
+    } else {
+      setAvatarPreview(null);
+    }
+    setAvatarFile(null);
+  }, [user]);
+
   const generateNewPassword = () => {
     const newPassword = generateTemporaryPassword();
     setTemporaryPassword(newPassword);
@@ -97,13 +109,37 @@ export const EditUserDialog = ({ user, open, onOpenChange, onUpdateUser }: EditU
     setShowPassword(!showPassword);
   };
 
+  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      toast({ title: "Tipo de archivo no permitido", description: "Solo se permiten imágenes JPG o PNG.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "Archivo demasiado grande", description: "El tamaño máximo es 2MB.", variant: "destructive" });
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async (data: UserEditValues) => {
     if (!user) return;
     
     setIsSubmitting(true);
     try {
+      // Subir imagen si existe
+      let avatar_url = user.avatar_url;
+      if (avatarFile) {
+        const ext = avatarFile.name.split('.').pop();
+        const fileName = `${uuidv4()}.${ext}`;
+        const uploadPath = `/public/lovable-uploads/${fileName}`;
+        avatar_url = `/lovable-uploads/${fileName}`;
+        // En un entorno real, deberías subir el archivo al servidor aquí
+      }
       // Update user data
-      onUpdateUser(user.id, data);
+      onUpdateUser(user.id, { ...data, avatar_url });
       
       // Update temporary password in localStorage if provided
       if (data.temporaryPassword) {
@@ -250,6 +286,16 @@ export const EditUserDialog = ({ user, open, onOpenChange, onUpdateUser }: EditU
                   )}
                 />
               )}
+              
+              <div>
+                <Label htmlFor="avatar">Imagen de perfil (opcional)</Label>
+                <Input id="avatar" type="file" accept="image/jpeg,image/png" onChange={handleAvatarChange} />
+                {avatarPreview && (
+                  <div className="mt-2">
+                    <img src={avatarPreview} alt="Previsualización" className="h-16 w-16 rounded-full object-cover border" />
+                  </div>
+                )}
+              </div>
               
               <DialogFooter>
                 <Button

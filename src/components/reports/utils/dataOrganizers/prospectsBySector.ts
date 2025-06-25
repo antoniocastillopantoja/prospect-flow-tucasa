@@ -1,11 +1,11 @@
+import { supabase } from "@/lib/supabaseClient";
 
-import { mockProspects } from "@/models/Prospect";
-
-// Get prospects data organized by sector
-export const getProspectsBySector = () => {
+// Get prospects data organized by sector (from Supabase)
+export const getProspectsBySector = async () => {
+  const { data: prospects, error } = await supabase.from('prospects').select('*');
   const prospectsBySector: Record<string, any[]> = {};
-  
-  mockProspects.forEach(prospect => {
+  if (error || !prospects) return prospectsBySector;
+  prospects.forEach(prospect => {
     const sector = prospect.sector || "Desconocido";
     if (!prospectsBySector[sector]) {
       prospectsBySector[sector] = [];
@@ -25,6 +25,5 @@ export const getProspectsBySector = () => {
       Notas: prospect.notes || ""
     });
   });
-  
   return prospectsBySector;
 };

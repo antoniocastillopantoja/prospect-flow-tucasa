@@ -1,11 +1,11 @@
+import { supabase } from "@/lib/supabaseClient";
 
-import { mockProspects } from "@/models/Prospect";
-
-// Get prospects data organized by status
-export const getProspectsByStatus = () => {
+// Get prospects data organized by status (from Supabase)
+export const getProspectsByStatus = async () => {
+  const { data: prospects, error } = await supabase.from('prospects').select('*');
   const prospectsByStatus: Record<string, any[]> = {};
-  
-  mockProspects.forEach(prospect => {
+  if (error || !prospects) return prospectsByStatus;
+  prospects.forEach(prospect => {
     const status = prospect.status || "Desconocido";
     if (!prospectsByStatus[status]) {
       prospectsByStatus[status] = [];
@@ -25,6 +25,5 @@ export const getProspectsByStatus = () => {
       Notas: prospect.notes || ""
     });
   });
-  
   return prospectsByStatus;
 };

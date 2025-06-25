@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import ProspectCard from "@/components/ProspectCard";
@@ -7,7 +6,7 @@ import { Prospect, ProspectStatus } from "@/models/Prospect";
 interface ProspectListProps {
   prospects: Prospect[];
   loading: boolean;
-  onStatusChange: (id: number, status: ProspectStatus) => void;
+  onStatusChange: (id: string, status: ProspectStatus) => void;
 }
 
 const ProspectList: React.FC<ProspectListProps> = ({

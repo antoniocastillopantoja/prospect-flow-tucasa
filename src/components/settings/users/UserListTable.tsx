@@ -1,4 +1,3 @@
-
 import { User } from "@/types/settings";
 import { 
   Table, 
@@ -15,6 +14,11 @@ interface UserListTableProps {
   onEditClick: (user: User) => void;
   onToggleStatusClick: (user: User) => void;
   onDeleteClick: (user: User) => void;
+}
+
+// Utilidad para generar URL de avatar DiceBear
+function getDiceBearAvatarUrl(seed: string) {
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(seed)}&backgroundType=gradientLinear&fontWeight=700`;
 }
 
 export const UserListTable = ({ 
@@ -39,7 +43,16 @@ export const UserListTable = ({
           {filteredUsers.length > 0 ? (
             filteredUsers.map(user => (
               <TableRow key={user.id}>
-                <TableCell>{user.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt={user.name} className="h-8 w-8 rounded-full object-cover border" />
+                    ) : (
+                      <img src={getDiceBearAvatarUrl(user.name)} alt={user.name} className="h-8 w-8 rounded-full object-cover border" />
+                    )}
+                    <span>{user.name}</span>
+                  </div>
+                </TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>
                 <TableCell>

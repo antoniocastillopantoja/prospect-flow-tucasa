@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Home, MapPin, Phone, User, ExternalLink } from "lucide-react";
@@ -9,7 +8,7 @@ import { Prospect, ProspectStatus } from "@/models/Prospect";
 
 interface ProspectCardProps {
   prospect: Prospect;
-  onStatusChange?: (id: number, status: ProspectStatus) => void;
+  onStatusChange?: (id: string, status: ProspectStatus) => void;
 }
 
 const ProspectCard: React.FC<ProspectCardProps> = ({ prospect, onStatusChange }) => {

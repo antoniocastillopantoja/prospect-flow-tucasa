@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FileDown } from "lucide-react";
@@ -47,23 +46,18 @@ export const DownloadButton = ({
     setShowDownloadDialog(true);
   };
 
-  const handleDownloadReport = () => {
+  const handleDownloadReport = async () => {
     setIsDownloading(true);
-
     try {
       const reportLabel = getReportLabel(selectedReportType);
       const filename = getReportFilename(reportLabel, timeframe);
-      
-      const wb = generateExcelWorkbook(selectedReportType, timeframe);
-      
+      const wb = await generateExcelWorkbook(selectedReportType, timeframe);
       XLSX.writeFile(wb, filename);
-
       toast({
         title: "Reporte descargado",
         description: `Se ha descargado el reporte de ${reportLabel} para el ${getTimeframeDescription(timeframe)}`,
         variant: "default",
       });
-      
       setShowDownloadDialog(false);
     } catch (error) {
       console.error("Error downloading report:", error);

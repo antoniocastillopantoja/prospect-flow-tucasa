@@ -1,4 +1,3 @@
-
 import {
   BarChart,
   Bar,
@@ -13,10 +12,74 @@ import {
   Cell
 } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { reportData } from "../reportData";
+import { useEffect, useState } from "react";
+import { getProspectsBySource } from "../utils/dataOrganizers/prospectsBySource";
+import { getProspectsByStatus } from "../utils/dataOrganizers/prospectsByStatus";
+import { getProspectsBySector } from "../utils/dataOrganizers/prospectsBySector";
+import { getProspectsByAgent } from "../utils/dataOrganizers/prospectsByAgent";
 
 export const ProspectCharts = () => {
-  const { prospectsBySource, prospectsByStatus, prospectsBySector, prospectsByAgent } = reportData;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [prospectsBySource, setProspectsBySource] = useState<any[]>([]);
+  const [prospectsByStatus, setProspectsByStatus] = useState<any[]>([]);
+  const [prospectsBySector, setProspectsBySector] = useState<any[]>([]);
+  const [prospectsByAgent, setProspectsByAgent] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fuente
+        const sourceData = await getProspectsBySource();
+        setProspectsBySource(
+          Object.entries(sourceData).map(([name, items]) => ({
+            name,
+            value: items.length
+          }))
+        );
+        // Estado
+        const statusData = await getProspectsByStatus();
+        setProspectsByStatus(
+          Object.entries(statusData).map(([name, items], idx) => ({
+            name,
+            value: items.length,
+            color: ["#3182CE", "#ECC94B", "#805AD5", "#E53E3E", "#48BB78"][idx % 5]
+          }))
+        );
+        // Sector
+        const sectorData = await getProspectsBySector();
+        setProspectsBySector(
+          Object.entries(sectorData).map(([name, items]) => ({
+            name,
+            nuevos: items.filter((i: any) => i.Estado === "new").length,
+            contactados: items.filter((i: any) => i.Estado === "contacted").length,
+            citas: items.filter((i: any) => i.Estado === "appointment").length,
+            cerrados: items.filter((i: any) => i.Estado === "closed").length
+          }))
+        );
+        // Agente
+        const agentData = await getProspectsByAgent();
+        setProspectsByAgent(
+          Object.entries(agentData).map(([name, items]) => ({
+            name,
+            nuevos: items.filter((i: any) => i.Estado === "new").length,
+            contactados: items.filter((i: any) => i.Estado === "contacted").length,
+            citas: items.filter((i: any) => i.Estado === "appointment").length,
+            cerrados: items.filter((i: any) => i.Estado === "closed").length
+          }))
+        );
+      } catch (err: any) {
+        setError("Error al cargar los datos de los reportes");
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="p-8 text-center">Cargando reportes...</div>;
+  if (error) return <div className="p-8 text-center text-red-600">{error}</div>;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

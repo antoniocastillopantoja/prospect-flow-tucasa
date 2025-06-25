@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Table, 
@@ -8,7 +7,12 @@ import {
   TableRow, 
   TableCell 
 } from "@/components/ui/table";
-import { reportData } from "./reportData";
+import { useEffect, useState } from "react";
+import { getProspectsBySource } from "./utils/dataOrganizers/prospectsBySource";
+import { getProspectsByAgent } from "./utils/dataOrganizers/prospectsByAgent";
+import { getProspectsBySector } from "./utils/dataOrganizers/prospectsBySector";
+import { getProspectsByStatus } from "./utils/dataOrganizers/prospectsByStatus";
+import { getCommissionsByAgent } from "./utils/dataOrganizers/commissionsByAgent";
 
 interface ReportTablesProps {
   activeTab: string;
@@ -17,6 +21,33 @@ interface ReportTablesProps {
 
 export const ReportTables = ({ activeTab, reportType = "prospectos" }: ReportTablesProps) => {
   if (activeTab !== "tablas") return null;
+
+  // Estado para la tabla de fuente
+  const [loadingSource, setLoadingSource] = useState(true);
+  const [errorSource, setErrorSource] = useState<string | null>(null);
+  const [sourceRows, setSourceRows] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchSource = async () => {
+      setLoadingSource(true);
+      setErrorSource(null);
+      try {
+        const sourceData = await getProspectsBySource();
+        const rows = Object.entries(sourceData).map(([name, items]) => ({
+          name,
+          prospectos: items.length,
+          citas: items.filter((i: any) => i.Estado === "appointment").length,
+          ventas: items.filter((i: any) => i.Estado === "closed").length,
+          conversion: items.length > 0 ? `${((items.filter((i: any) => i.Estado === "closed").length / items.length) * 100).toFixed(1)}%` : "0%"
+        }));
+        setSourceRows(rows);
+      } catch (err) {
+        setErrorSource("Error al cargar datos de fuente");
+      }
+      setLoadingSource(false);
+    };
+    fetchSource();
+  }, []);
 
   const renderProspectsTable = () => (
     <>
@@ -80,98 +111,74 @@ export const ReportTables = ({ activeTab, reportType = "prospectos" }: ReportTab
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2">Fuente</th>
-                  <th className="text-right p-2">Prospectos</th>
-                  <th className="text-right p-2">Citas</th>
-                  <th className="text-right p-2">Ventas</th>
-                  <th className="text-right p-2">Tasa de conversión</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  <td className="p-2">Facebook</td>
-                  <td className="text-right p-2">45</td>
-                  <td className="text-right p-2">26</td>
-                  <td className="text-right p-2">9</td>
-                  <td className="text-right p-2">20%</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-2">Instagram</td>
-                  <td className="text-right p-2">28</td>
-                  <td className="text-right p-2">17</td>
-                  <td className="text-right p-2">5</td>
-                  <td className="text-right p-2">17.9%</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-2">TikTok</td>
-                  <td className="text-right p-2">15</td>
-                  <td className="text-right p-2">8</td>
-                  <td className="text-right p-2">2</td>
-                  <td className="text-right p-2">13.3%</td>
-                </tr>
-                <tr className="border-b">
-                  <td className="p-2">Sitio Web</td>
-                  <td className="text-right p-2">32</td>
-                  <td className="text-right p-2">20</td>
-                  <td className="text-right p-2">7</td>
-                  <td className="text-right p-2">21.9%</td>
-                </tr>
-                <tr>
-                  <td className="p-2">Referidos</td>
-                  <td className="text-right p-2">20</td>
-                  <td className="text-right p-2">12</td>
-                  <td className="text-right p-2">4</td>
-                  <td className="text-right p-2">20%</td>
-                </tr>
-              </tbody>
-            </table>
+            {loadingSource ? (
+              <div className="p-4 text-center">Cargando datos...</div>
+            ) : errorSource ? (
+              <div className="p-4 text-center text-red-600">{errorSource}</div>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2">Fuente</th>
+                    <th className="text-right p-2">Prospectos</th>
+                    <th className="text-right p-2">Citas</th>
+                    <th className="text-right p-2">Ventas</th>
+                    <th className="text-right p-2">Tasa de conversión</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sourceRows.map((row, idx) => (
+                    <tr key={idx} className="border-b">
+                      <td className="p-2">{row.name}</td>
+                      <td className="text-right p-2">{row.prospectos}</td>
+                      <td className="text-right p-2">{row.citas}</td>
+                      <td className="text-right p-2">{row.ventas}</td>
+                      <td className="text-right p-2">{row.conversion}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </CardContent>
       </Card>
     </>
   );
 
-  const renderConversionTable = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>Embudo de Conversión</CardTitle>
-        <CardDescription>Detalle del seguimiento de prospectos a través del proceso de ventas</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Etapa</TableHead>
-                <TableHead className="text-right">Cantidad</TableHead>
-                <TableHead className="text-right">Porcentaje</TableHead>
-                <TableHead className="text-right">Tendencia (vs mes anterior)</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {reportData.conversionData.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{item.etapa}</TableCell>
-                  <TableCell className="text-right">{item.cantidad}</TableCell>
-                  <TableCell className="text-right">{item.porcentaje}</TableCell>
-                  <TableCell className="text-right">
-                    {index % 2 === 0 ? (
-                      <span className="text-green-600">+{Math.floor(Math.random() * 5) + 1}%</span>
-                    ) : (
-                      <span className="text-red-600">-{Math.floor(Math.random() * 3) + 1}%</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  // Tabla de agentes
+  const [loadingAgent, setLoadingAgent] = useState(true);
+  const [errorAgent, setErrorAgent] = useState<string | null>(null);
+  const [agentRows, setAgentRows] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchAgent = async () => {
+      setLoadingAgent(true);
+      setErrorAgent(null);
+      try {
+        const data = await getProspectsByAgent();
+        const rows = Object.entries(data).map(([agente, items]: any) => {
+          const prospectos = items.length;
+          const citas = items.filter((i: any) => i.Estado === "appointment").length;
+          const ventas = items.filter((i: any) => i.Estado === "closed").length;
+          const conversion = prospectos > 0 ? `${((ventas / prospectos) * 100).toFixed(1)}%` : "0%";
+          // Comisiones: sumar campo "Monto Comisión" si existe
+          const comision = items.reduce((sum: number, i: any) => {
+            if (i["Monto Comisión"]) {
+              const val = parseFloat((i["Monto Comisión"]+"").replace(/[^\d.]/g, ""));
+              return sum + (isNaN(val) ? 0 : val);
+            }
+            return sum;
+          }, 0);
+          return { agente, prospectos, citas, ventas, conversion, comision: comision ? `$${comision.toLocaleString()}` : "$0" };
+        });
+        setAgentRows(rows);
+      } catch (err) {
+        setErrorAgent("Error al cargar datos de agentes");
+      }
+      setLoadingAgent(false);
+    };
+    fetchAgent();
+  }, []);
 
   const renderAgentsTable = () => (
     <Card>
@@ -181,55 +188,36 @@ export const ReportTables = ({ activeTab, reportType = "prospectos" }: ReportTab
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Agente</TableHead>
-                <TableHead className="text-right">Prospectos</TableHead>
-                <TableHead className="text-right">Citas</TableHead>
-                <TableHead className="text-right">Ventas</TableHead>
-                <TableHead className="text-right">Conversión</TableHead>
-                <TableHead className="text-right">Comisión</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {reportData.agentPerformanceData.map((agent, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{agent.agente}</TableCell>
-                  <TableCell className="text-right">{agent.prospectos}</TableCell>
-                  <TableCell className="text-right">{agent.citas}</TableCell>
-                  <TableCell className="text-right">{agent.ventas}</TableCell>
-                  <TableCell className="text-right">{agent.conversion}</TableCell>
-                  <TableCell className="text-right">{agent.comision}</TableCell>
+          {loadingAgent ? (
+            <div className="p-4 text-center">Cargando datos...</div>
+          ) : errorAgent ? (
+            <div className="p-4 text-center text-red-600">{errorAgent}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Agente</TableHead>
+                  <TableHead className="text-right">Prospectos</TableHead>
+                  <TableHead className="text-right">Citas</TableHead>
+                  <TableHead className="text-right">Ventas</TableHead>
+                  <TableHead className="text-right">Conversión</TableHead>
+                  <TableHead className="text-right">Comisión</TableHead>
                 </TableRow>
-              ))}
-              <TableRow>
-                <TableCell className="font-bold">Total</TableCell>
-                <TableCell className="text-right font-bold">
-                  {reportData.agentPerformanceData.reduce((sum, agent) => sum + agent.prospectos, 0)}
-                </TableCell>
-                <TableCell className="text-right font-bold">
-                  {reportData.agentPerformanceData.reduce((sum, agent) => sum + agent.citas, 0)}
-                </TableCell>
-                <TableCell className="text-right font-bold">
-                  {reportData.agentPerformanceData.reduce((sum, agent) => sum + agent.ventas, 0)}
-                </TableCell>
-                <TableCell className="text-right font-bold">
-                  {(reportData.agentPerformanceData.reduce((sum, agent) => sum + parseFloat(agent.conversion), 0) / 
-                  reportData.agentPerformanceData.length).toFixed(1)}%
-                </TableCell>
-                <TableCell className="text-right font-bold">
-                  $
-                  {reportData.agentPerformanceData
-                    .reduce(
-                      (sum, agent) => sum + parseInt(agent.comision.replace('$', '').replace(',', '')), 
-                      0
-                    )
-                    .toLocaleString()}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {agentRows.map((agent, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell className="font-medium">{agent.agente}</TableCell>
+                    <TableCell className="text-right">{agent.prospectos}</TableCell>
+                    <TableCell className="text-right">{agent.citas}</TableCell>
+                    <TableCell className="text-right">{agent.ventas}</TableCell>
+                    <TableCell className="text-right">{agent.conversion}</TableCell>
+                    <TableCell className="text-right">{agent.comision}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ProspectForm } from "@/components/prospects/ProspectForm";
@@ -26,7 +25,7 @@ interface EditProspectDialogProps {
   onCancel: () => void;
   isLoading: boolean;
   onDelete?: () => void;
-  prospectId?: number;
+  prospectId?: string;
   prospectStatus?: ProspectStatus;
 }
 

@@ -1,8 +1,8 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { isTemporaryPassword } from "@/utils/passwordUtils";
 import ChangePasswordDialog from "@/components/auth/ChangePasswordDialog";
+import { createClient } from '@supabase/supabase-js';
 
 type User = {
   id: string;
@@ -20,6 +20,10 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -48,34 +52,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
-    
     try {
-      // Verificar si es una contraseña temporal
-      if (isTemporaryPassword(password)) {
-        // Guardar email y password temporalmente para cuando se cambie la contraseña
-        setTempLoginEmail(email);
-        setTempLoginPassword(password);
-        setIsTemporaryPasswordDetected(true);
-        setIsLoading(false);
-        return;
+      // Consulta directa a la tabla users
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('id, full_name, email, status, password')
+        .eq('email', email)
+        .single();
+      if (error || !user) throw new Error('Usuario no encontrado');
+      if (password !== user.password) throw new Error('Contraseña incorrecta');
+      // Consulta el rol del usuario
+      const { data: userRole } = await supabase
+        .from('user_roles')
+        .select('role_id')
+        .eq('user_id', user.id)
+        .single();
+      let roleName = 'Sin rol';
+      if (userRole && userRole.role_id) {
+        const { data: role } = await supabase
+          .from('roles')
+          .select('name')
+          .eq('id', userRole.role_id)
+          .single();
+        if (role && role.name) {
+          roleName = role.name;
+        }
       }
-      
-      // Simulación de autenticación - Esto sería reemplazado por una API real
-      if (email === "demo@tucasaideal.com" && password === "password") {
-        const userData: User = {
-          id: "1",
-          name: "Juan Pérez",
-          email: "demo@tucasaideal.com",
-          role: "Gerente",
-        };
-        
-        // Guardar usuario en localStorage
-        localStorage.setItem("user", JSON.stringify(userData));
-        setUser(userData);
-        navigate("/");
-      } else {
-        throw new Error("Credenciales incorrectas");
-      }
+      // Elimina el campo password antes de guardar
+      delete user.password;
+      user.role = roleName;
+      localStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+      navigate("/");
     } catch (error) {
       throw error;
     } finally {

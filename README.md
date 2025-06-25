@@ -35,6 +35,16 @@ npm i
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
+** para cambios
+- git status para saber si hubo algun cambio
+- git add . para agregar los cambios
+- git commit -m "se describe el cambio"
+- git branch -m main la verdad no se para que es pero entiendo que se hace la primera vez
+- git push origin main aqui ya se sube al github
+
+** aqui si haces un cambio en lovable o cursor y quieres actualizar la app se usa este comando para bajar el cambio
+- git pull origin main
+
 
 **Edit a file directly in GitHub**
 

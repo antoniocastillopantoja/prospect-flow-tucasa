@@ -1,7 +1,7 @@
 export type ProspectStatus = "new" | "contacted" | "appointment" | "canceled" | "closed";
 
 export interface Prospect {
-  id: number;
+  id: string;
   name: string;
   phone: string;
   email?: string;
@@ -22,7 +22,7 @@ export interface Prospect {
 // Mock data for prospects
 export const mockProspects: Prospect[] = [
   {
-    id: 1,
+    id: "1",
     name: "Carlos Vega",
     phone: "555-111-2222",
     email: "carlos.vega@example.com",
@@ -36,7 +36,7 @@ export const mockProspects: Prospect[] = [
     status: "new"
   },
   {
-    id: 2,
+    id: "2",
     name: "María López",
     phone: "555-333-4444",
     email: "maria.lopez@example.com",
@@ -50,7 +50,7 @@ export const mockProspects: Prospect[] = [
     status: "contacted"
   },
   {
-    id: 3,
+    id: "3",
     name: "Roberto Sánchez",
     phone: "555-555-6666",
     email: "roberto.sanchez@example.com",
@@ -64,7 +64,7 @@ export const mockProspects: Prospect[] = [
     status: "appointment"
   },
   {
-    id: 4,
+    id: "4",
     name: "Laura Martínez",
     phone: "555-777-8888",
     email: "laura.martinez@example.com",
@@ -81,7 +81,7 @@ export const mockProspects: Prospect[] = [
     negotiatedPrice: "2750000"
   },
   {
-    id: 5,
+    id: "5",
     name: "Javier Luna",
     phone: "555-999-0000",
     email: "javier.luna@example.com",
@@ -95,7 +95,7 @@ export const mockProspects: Prospect[] = [
     status: "canceled"
   },
   {
-    id: 6,
+    id: "6",
     name: "Ana Torres",
     phone: "555-222-3333",
     email: "ana.torres@example.com",
@@ -110,6 +110,21 @@ export const mockProspects: Prospect[] = [
   }
 ];
 
-export const sectors = ["Norte", "Sur", "Centro"];
+export const sectors = [
+  "Norte",
+  "Sur",
+  "Centro",
+  "Este",
+  "Oeste",
+  "Noroeste",
+  "Noreste",
+  "Suroeste",
+  "Sureste",
+  "Campo",
+  "Playa",
+  "Residencial",
+  "Industrial",
+  "Comercial"
+];
 export const creditTypes = ["Bancario", "Infonavit", "Fovissste", "Contado", "Otro"];
 export const agents = ["Juan Pérez", "Ana Rodríguez", "Pedro Ramírez"];

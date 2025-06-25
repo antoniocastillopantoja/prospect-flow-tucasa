@@ -1,4 +1,3 @@
-
 import * as XLSX from 'xlsx';
 import { getReportDataByType } from './reportDataUtils';
 import { 
@@ -40,7 +39,7 @@ const createCategorySheets = (
 /**
  * Get the appropriate data organizer function based on report type
  */
-const getDataOrganizerByReportType = (reportType: string): (() => Record<string, any[]>) => {
+const getDataOrganizerByReportType = (reportType: string): (() => Promise<Record<string, any[]>>) => {
   switch (reportType) {
     case "fuente":
       return getProspectsBySource;
@@ -53,26 +52,23 @@ const getDataOrganizerByReportType = (reportType: string): (() => Record<string,
     case "comisiones":
       return getCommissionsByAgent;
     default:
-      return () => ({});
+      return async () => ({});
   }
 };
 
-// Create commission report workbook
-const createCommissionsWorkbook = () => {
+// Create commission report workbook (ahora asíncrono)
+const createCommissionsWorkbook = async () => {
   const wb = XLSX.utils.book_new();
-  
   // Añadir hoja de resumen de comisiones por agente
-  const summaryData = getCommissionsSummaryByAgent();
+  const summaryData = await getCommissionsSummaryByAgent();
   const summaryWs = XLSX.utils.json_to_sheet(summaryData);
   XLSX.utils.book_append_sheet(wb, summaryWs, "Resumen Comisiones");
-  
   // Añadir hoja con todas las ventas cerradas
-  const closedProspectsData = getAllClosedProspects();
+  const closedProspectsData = await getAllClosedProspects();
   const closedProspectsWs = XLSX.utils.json_to_sheet(closedProspectsData);
   XLSX.utils.book_append_sheet(wb, closedProspectsWs, "Ventas Cerradas");
-  
   // Añadir hojas por agente
-  const commissionsByAgent = getCommissionsByAgent();
+  const commissionsByAgent = await getCommissionsByAgent();
   Object.entries(commissionsByAgent).forEach(([agent, commissions]) => {
     if (commissions.length > 0) {
       const agentWs = XLSX.utils.json_to_sheet(commissions);
@@ -81,33 +77,27 @@ const createCommissionsWorkbook = () => {
       XLSX.utils.book_append_sheet(wb, agentWs, sheetName);
     }
   });
-  
   return wb;
 };
 
-// Generate Excel workbook based on report type and timeframe
-export const generateExcelWorkbook = (reportType: string, timeframe: string) => {
+// Generate Excel workbook based on report type and timeframe (ahora asíncrono)
+export const generateExcelWorkbook = async (reportType: string, timeframe: string) => {
   // Para el reporte de comisiones, usar una lógica especializada
   if (reportType === "comisiones") {
-    return createCommissionsWorkbook();
+    return await createCommissionsWorkbook();
   }
-  
   // Create a new workbook
   const wb = XLSX.utils.book_new();
-  
   // Add the summary data as the first sheet
-  const summaryData = getReportDataByType(reportType);
+  const summaryData = await getReportDataByType(reportType);
   const summaryWs = XLSX.utils.json_to_sheet(summaryData);
   XLSX.utils.book_append_sheet(wb, summaryWs, "Resumen");
-  
   // Get the appropriate data organizer for the report type
   const dataOrganizer = getDataOrganizerByReportType(reportType);
-  
   // Generate category-specific sheets if this is a supported report type
   if (["fuente", "estado", "sector", "agente"].includes(reportType)) {
-    const groupedProspects = dataOrganizer();
+    const groupedProspects = await dataOrganizer();
     createCategorySheets(wb, groupedProspects);
   }
-  
   return wb;
 };

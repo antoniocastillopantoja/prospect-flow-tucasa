@@ -1,4 +1,3 @@
-
 import { 
   Home, 
   Users, 
@@ -21,6 +20,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+
+// Utilidad para generar URL de avatar DiceBear
+function getDiceBearAvatarUrl(seed: string) {
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(seed)}&backgroundType=gradientLinear&fontWeight=700`;
+}
 
 export function AppSidebar() {
   const { user, logout } = useAuth();
@@ -80,7 +84,15 @@ export function AppSidebar() {
           <div className="flex items-center justify-between mb-4 p-2 rounded-md hover:bg-sidebar-accent/50 cursor-pointer">
             <div className="flex items-center">
               <Avatar className="h-8 w-8 mr-2">
-                <AvatarFallback>{user?.name.charAt(0) || "U"}</AvatarFallback>
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt={user?.name || 'Usuario'} className="h-8 w-8 rounded-full object-cover" />
+                ) : (
+                  <img
+                    src={getDiceBearAvatarUrl(user?.name || 'Usuario')}
+                    alt={user?.name || 'Usuario'}
+                    className="h-8 w-8 rounded-full object-cover"
+                  />
+                )}
               </Avatar>
               <div>
                 <p className="text-sm font-medium">{user?.name || "Usuario"}</p>

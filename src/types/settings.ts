@@ -1,10 +1,10 @@
-
 export interface User {
   id: string;
   name: string;
   email: string;
   role: string;
   status: string;
+  avatar_url?: string;
 }
 
 export interface IntegrationConfig {

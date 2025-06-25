@@ -1,4 +1,3 @@
-
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,9 +14,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { sendInvitationEmail } from "@/utils/emailUtils";
 import { generateTemporaryPassword } from "@/utils/passwordUtils";
+import { v4 as uuidv4 } from "uuid";
 
 // Define schema for user form validation
 export const userFormSchema = z.object({
@@ -36,6 +36,8 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [temporaryPassword, setTemporaryPassword] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   
   const form = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
@@ -46,6 +48,21 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
     }
   });
 
+  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      toast({ title: "Tipo de archivo no permitido", description: "Solo se permiten imágenes JPG o PNG.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "Archivo demasiado grande", description: "El tamaño máximo es 2MB.", variant: "destructive" });
+      return;
+    }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async (data: UserFormValues) => {
     setIsSubmitting(true);
     
@@ -54,6 +71,19 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
       const tempPassword = generateTemporaryPassword();
       setTemporaryPassword(tempPassword);
       
+      // Subir imagen si existe
+      let avatar_url = undefined;
+      if (avatarFile) {
+        // Generar nombre único
+        const ext = avatarFile.name.split('.').pop();
+        const fileName = `${uuidv4()}.${ext}`;
+        const uploadPath = `/public/lovable-uploads/${fileName}`;
+        // Copiar archivo (esto solo funcionará en entorno Node, para producción se requiere backend o API)
+        // Aquí solo simulamos la URL
+        avatar_url = `/lovable-uploads/${fileName}`;
+        // En un entorno real, deberías subir el archivo al servidor aquí
+      }
+
       // Send invitation email with temporary password
       const emailSent = await sendInvitationEmail(
         data.email,
@@ -66,7 +96,8 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
         // Add the user to the system with temporary password flag
         onAddUser({
           ...data,
-          temporaryPassword: tempPassword
+          temporaryPassword: tempPassword,
+          avatar_url
         });
         
         // Show success toast
@@ -79,6 +110,8 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
         setTimeout(() => {
           form.reset();
           setTemporaryPassword("");
+          setAvatarFile(null);
+          setAvatarPreview(null);
         }, 10000); // Clear after 10 seconds
       } else {
         // Show error toast
@@ -134,6 +167,16 @@ export const UserForm = ({ onAddUser }: UserFormProps) => {
           />
         </div>
         
+        <div>
+          <Label htmlFor="avatar">Imagen de perfil (opcional)</Label>
+          <Input id="avatar" type="file" accept="image/jpeg,image/png" onChange={handleAvatarChange} />
+          {avatarPreview && (
+            <div className="mt-2">
+              <img src={avatarPreview} alt="Previsualización" className="h-16 w-16 rounded-full object-cover border" />
+            </div>
+          )}
+        </div>
+
         <FormField
           control={form.control}
           name="role"

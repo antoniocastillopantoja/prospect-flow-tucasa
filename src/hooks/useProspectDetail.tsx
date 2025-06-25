@@ -9,7 +9,7 @@ import { useAppointments, Appointment } from "@/hooks/useAppointments";
 import { PropertyCommissionFormData } from "@/components/prospects/dialogs/PropertyCommissionDialog";
 
 export function useProspectDetail(initialNotes: Note[] = [], initialAppointments: Appointment[] = []) {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { prospects, updateProspect, updateProspectStatus, deleteProspect } = useProspects();
